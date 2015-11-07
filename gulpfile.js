@@ -65,6 +65,7 @@ gulp.task('run-unit-tests', ['concat-compiled-ts-tests', 'template-cache'], func
         'node_modules/angular-mocks/angular-mocks.js',
         'node_modules/angular-ui-router/release/angular-ui-router.js',
         'node_modules/fastclick/lib/fastclick.js',
+        'node_modules/ng-x/dist/ngX.js',
         'dist/ngX.components.js',
         'test/tests.js'])
         .pipe(karma({
