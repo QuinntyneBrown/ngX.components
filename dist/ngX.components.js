@@ -1,6 +1,6 @@
+angular.module("ngX.components", ["ngX"]);
 
-
-//# sourceMappingURL=app.js.map
+//# sourceMappingURL=ngX.components.module.js.map
 
 var ngX;
 (function (ngX) {
@@ -32,6 +32,15 @@ var ngX;
             return Rotator;
         })();
         components.Rotator = Rotator;
+        ngX.Component({
+            module: "ngX.components",
+            selector: "rotator",
+            component: Rotator,
+            template: [
+                "<div class='rotator'>",
+                "</div>"
+            ].join(" ")
+        });
     })(components = ngX.components || (ngX.components = {}));
 })(ngX || (ngX = {}));
 

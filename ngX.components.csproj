@@ -67,6 +67,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="dist\ngX.components.js" />
     <Content Include="examples\basic\index.html" />
     <Content Include="gulpfile.config.js" />
     <Content Include="gulpfile.js" />
@@ -80,17 +81,16 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="src\app.ts" />
+    <TypeScriptCompile Include="src\components\hamburgerButton.ts" />
     <TypeScriptCompile Include="src\components\rotator.ts" />
+    <TypeScriptCompile Include="src\ngX.components.module.ts" />
     <TypeScriptCompile Include="typings\angularjs\angular.d.ts" />
     <TypeScriptCompile Include="typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="typings\ngX\ngX.d.ts" />
     <TypeScriptCompile Include="typings\tsd.d.ts" />
     <TypeScriptCompile Include="typings\typeScriptApp.d.ts" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="dist\" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
