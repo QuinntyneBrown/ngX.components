@@ -93,6 +93,7 @@
     <TypeScriptCompile Include="src\components\hamburgerButton.ts" />
     <TypeScriptCompile Include="src\components\listDetail.ts" />
     <TypeScriptCompile Include="src\components\rotator.ts" />
+    <TypeScriptCompile Include="src\components\virtualFor.ts" />
     <TypeScriptCompile Include="src\ngX.components.module.ts" />
     <TypeScriptCompile Include="typings\angularjs\angular.d.ts" />
     <TypeScriptCompile Include="typings\jquery\jquery.d.ts" />

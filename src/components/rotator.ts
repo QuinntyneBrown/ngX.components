@@ -22,12 +22,95 @@
 
         }
 
+        private onInit = () => {
+
+            this.$transclude(this.$scope, (clone: ng.IAugmentedJQuery) => {
+                this.clone = clone;
+                var fragment = document.createDocumentFragment();
+                var template = this.getHtml(<HTMLElement>this.clone[0].children[0], true);
+                for (var i = 0; i < this.items.length; i++) {
+                    var childScope: any = this.$scope.$new(true);
+                    childScope[this.$attrs["rotatorForName"] || "rotatorItem"] = this.items[i];
+                    childScope.$$index = i;
+                    childScope.$$isFirst = (i === 0);
+                    childScope.$$isLast = (i === this.items.length - 1);
+                    var itemContent = this.$compile(angular.element(template))(childScope);
+                    itemContent.addClass("slide");
+                    fragment.appendChild(itemContent[0]);
+                }
+                this.containerNavtiveElement.appendChild(fragment);
+            });
+
+
+        }
+
+        public onNextAsync = () => {
+            var deferred = this.$q.defer();
+            if (!this.isAnimating) {
+                var promises = [];
+                this.isAnimating = true;
+                for (var i = 0; i < this.slideNavtiveElements.length; i++) {
+                    promises.push(this.translateXAsync({ element: this.slideNavtiveElements[i], x: 100 }));
+                }
+                this.$q.all(promises).then(() => {
+                    this.isAnimating = false;
+                    deferred.resolve();
+                });
+            } else {
+                deferred.reject();
+            }
+            return deferred.promise;
+        }
+
+        public onPreviousAsync = () => {
+            var deferred = this.$q.defer();
+            if (!this.isAnimating) {
+                var promises = [];
+                this.isAnimating = true;
+                for (var i = 0; i < this.slideNavtiveElements.length; i++) {
+                    promises.push(this.translateXAsync({ element: this.slideNavtiveElements[i], x: 100 }));
+                }
+                this.$q.all(promises).then(() => {
+                    this.isAnimating = false;
+                    deferred.resolve();
+                });
+            } else {
+                deferred.reject();
+            }
+            return deferred.promise;
+        }
+
+        public dispose = () => {
+            angular.element(this.containerNavtiveElement).find(".slide").remove();
+            this.containerNavtiveElement.innerHTML = "";
+            this.$element[0].innerHTML = null;
+            this.$element = null;
+            this.$attrs = null;
+            this.clone = null;
+            delete this.$element;
+            delete this.clone;
+        }
+
+        private isAnimating: boolean;
+
+        private slideNavtiveElements: any;
+
+        private clone: any;
+
+        private containerNavtiveElement: any;
+
+        private items:any;
+
     }
 
     ngX.Component({
         module:"ngX.components",
         selector: "rotator",
         component: Rotator,
+        inputs: [
+            "previousButtonImageUrl",
+            "nextButtonImageUrl"
+        ],
         styles: [
             " .rotator .slide { ",
             "   transition: transform 0.5s cubic-bezier(0.1, 0.1, 0.25, 0.9); } ",
@@ -85,7 +168,12 @@
             "translateXAsync"
         ],
         template: [
-            "<div class='rotator'>",
+            "<div class='rotator'> ",
+            "<div class='view-port'>",
+            "<div class='container'></div>",
+            "<div class='previous-arrow' data-ng-click='vm.onPreviousAsync()'><img src='{{ vm.previousButtonImageUrl }}' /></div>",
+            "<div class='next-arrow' data-ng-click='vm.onNextAsync()'><img src='{{ vm.nextButtonImageUrl }}' /></div>",
+            "</div>",
             "</div>"
         ].join(" ")
     });
