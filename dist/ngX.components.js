@@ -24,6 +24,59 @@ var ngX;
     var components;
     (function (components) {
         /**
+         * @name ListDetail
+         * @module ngX.components
+         */
+        var ListDetail = (function () {
+            function ListDetail($element, $scope, $transclude) {
+                var _this = this;
+                this.$element = $element;
+                this.$scope = $scope;
+                this.$transclude = $transclude;
+                this.onInit = function () {
+                    _this.$transclude(_this.$scope, function (clone) {
+                        for (var i = 0; i < clone.length; i++) {
+                            if (clone[i].tagName && clone[i].tagName.toUpperCase() === "LIST")
+                                _this.listTemplate = clone[i].innerHTML;
+                            if (clone[i].tagName && clone[i].tagName.toUpperCase() === "DETAIL")
+                                _this.detailTemplate = clone[i].innerHTML;
+                        }
+                    });
+                };
+            }
+            return ListDetail;
+        })();
+        ngX.Component({
+            module: "ngX.components",
+            styles: [
+                ".list-detail { width: 100%; }"
+            ].join(" /n "),
+            selector: "list-detail",
+            component: ListDetail,
+            transclude: true,
+            providers: [
+                "$element",
+                "$scope",
+                "$transclude"
+            ],
+            template: [
+                "<div class='list-detail'>",
+                "<div class='list'></div>",
+                "<div class='detail'></div>",
+                "<div class='clear'></div>",
+                "</div>"
+            ].join(" ")
+        });
+    })(components = ngX.components || (ngX.components = {}));
+})(ngX || (ngX = {}));
+
+//# sourceMappingURL=listDetail.js.map
+
+var ngX;
+(function (ngX) {
+    var components;
+    (function (components) {
+        /**
          * @name Rotator
          * @
          */

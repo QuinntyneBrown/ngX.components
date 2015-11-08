@@ -59,8 +59,15 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="examples\listDetail\index.html" />
     <Content Include="node_modules\ng-x\dist\ngX.js" />
+    <Content Include="node_modules\ng-x\dist\ngX.min.js">
+      <DependentUpon>ngX.js</DependentUpon>
+    </Content>
     <Content Include="package.json" />
+    <Content Include="node_modules\ng-x\dist\ngX.min.js.map">
+      <DependentUpon>ngX.min.js</DependentUpon>
+    </Content>
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -84,6 +91,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="src\components\hamburgerButton.ts" />
+    <TypeScriptCompile Include="src\components\listDetail.ts" />
     <TypeScriptCompile Include="src\components\rotator.ts" />
     <TypeScriptCompile Include="src\ngX.components.module.ts" />
     <TypeScriptCompile Include="typings\angularjs\angular.d.ts" />
