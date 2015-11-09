@@ -3,13 +3,53 @@
 <head>
     <title>Youtube</title>
 </head>
-<body data-ng-app="ngX.components">
+<body data-ng-app="youTubeApp">
+    
+    <div>
+        <a href="#/">home</a>
+        <a href="#/video">video</a>
+    </div>
 
-    <youtube video-id="'4YmnbGoh49U'" width="'600'" height="'400'"></youtube>
+    <div ng-view>
+
+    </div>
+
 
     <script src="../../node_modules/angular/angular.js"></script>
     <script src="../../node_modules/angular-route/angular-route.js"></script>
     <script src="../../node_modules/ng-x/dist/ngX.js"></script>
     <script src="../../dist/ngX.components.js"></script>
+
+    <script>
+        angular.module("youTubeApp", ["ngX.components"]).config(["$routeProvider",
+            function($routeProvider) {
+
+                $routeProvider.when("/", {
+                    componentName: "homeComponent",
+                    componentTemplateUrl: "home.component.html"
+                });
+
+                $routeProvider.when("/video", {
+                    componentName: "videoComponent",
+                    componentTemplateUrl: "video.component.html"
+                });
+            }
+        ]);
+
+        
+
+        ngX.Component({
+            module: "youTubeApp",
+            component: function HomeComponent() { }
+        });
+
+        ngX.Component({
+            module: "youTubeApp",
+            component: function VideoComponent() { }
+        });
+
+    </script>
+
+
 </body>
 </html>

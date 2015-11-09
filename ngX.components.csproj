@@ -60,7 +60,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="examples\listDetail\index.html" />
+    <Content Include="examples\youtube\home.component.html" />
     <Content Include="examples\youtube\index.html" />
+    <Content Include="examples\youtube\video.component.html" />
     <Content Include="node_modules\ng-x\dist\ngX.js" />
     <Content Include="node_modules\ng-x\dist\ngX.min.js">
       <DependentUpon>ngX.js</DependentUpon>

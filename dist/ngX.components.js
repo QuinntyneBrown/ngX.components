@@ -312,11 +312,12 @@ var ngX;
     var components;
     (function (components) {
         var Youtube = (function () {
-            function Youtube($element, $scope, $window) {
+            function Youtube($element, $scope, $window, guid) {
                 var _this = this;
                 this.$element = $element;
                 this.$scope = $scope;
                 this.$window = $window;
+                this.guid = guid;
                 this.onInit = function () {
                     _this.insertYoutubeScriptTag();
                     _this.$window.onYouTubeIframeAPIReady = _this.onYouTubeIFrameApiReady;
@@ -341,6 +342,10 @@ var ngX;
                         width: _this.width,
                         videoId: _this.videoId,
                     });
+                };
+                this.dispose = function () {
+                    _this.player.destroy();
+                    _this.$element = null;
                 };
             }
             Object.defineProperty(Youtube.prototype, "height", {
@@ -380,7 +385,7 @@ var ngX;
             selector: "youtube",
             component: Youtube,
             inputs: ["height", "width", "videoId"],
-            providers: ["$element", "$scope", "$window"],
+            providers: ["$element", "$scope", "$window", "guid"],
             styles: [".youtube { }"].join(" /n "),
             template: ["<div class='youtube'></div>"].join(" ")
         });

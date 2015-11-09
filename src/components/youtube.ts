@@ -1,21 +1,24 @@
 ﻿ module ngX.components {
      
      class Youtube {
-         constructor(private $element: ng.IAugmentedJQuery, private $scope:ng.IScope, private $window:ng.IWindowService) { }
+         constructor(private $element: ng.IAugmentedJQuery,
+             private $scope: ng.IScope,
+             private $window: ng.IWindowService,
+             private guid:Function) { }
 
          public onInit = () => {
-             this.insertYoutubeScriptTag();
-             (<any>this.$window).onYouTubeIframeAPIReady = this.onYouTubeIFrameApiReady;
+            this.insertYoutubeScriptTag();
+            (<any>this.$window).onYouTubeIframeAPIReady = this.onYouTubeIFrameApiReady;
          }
 
-         public insertYoutubeScriptTag = () => {
-             var tag = document.createElement('script');
-             tag.src = "https://www.youtube.com/iframe_api";
-             var firstScriptTag = document.getElementsByTagName('script')[0];
-             firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+         public insertYoutubeScriptTag = () => {             
+                 var tag = document.createElement('script');
+                 tag.src = "https://www.youtube.com/iframe_api";
+                 var firstScriptTag = document.getElementsByTagName('script')[0];
+                 firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
          }
 
-         public onYouTubeIFrameApiReady = () => {                       
+         public onYouTubeIFrameApiReady = () => {                                  
              this.player = new YT.Player((<any>this.$element[0]), {
                  playerVars: {
                      autoplay: 0,
@@ -66,6 +69,10 @@
              this._videoId = value;
          }
 
+         private dispose = () => {
+             this.player.destroy();
+             this.$element = null;
+         }
      }
 
      ngX.Component({
@@ -73,7 +80,7 @@
          selector: "youtube",
          component: Youtube,
          inputs:["height","width","videoId"],
-         providers: ["$element","$scope","$window"],
+         providers: ["$element", "$scope", "$window","guid"],
          styles: [".youtube { }"].join(" /n "),
          template: ["<div class='youtube'></div>"].join(" ")
      });
