@@ -328,13 +328,10 @@ var ngX;
                     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
                 };
                 this.onYouTubeIFrameApiReady = function () {
-                    alert("works");
-                    _this.player = new YT.Player(_this.$element.children()[0], {
+                    _this.player = new YT.Player(_this.$element[0], {
                         playerVars: {
                             autoplay: 0,
-                            //html5: 1,
                             theme: "light",
-                            //modesbranding: 0,
                             color: "white",
                             iv_load_policy: 3,
                             showinfo: 1,
@@ -347,7 +344,7 @@ var ngX;
                 };
             }
             Object.defineProperty(Youtube.prototype, "height", {
-                get: function () { return this._height; },
+                get: function () { return this._height || "600"; },
                 set: function (value) {
                     if (value && value != this._height)
                         this.player.setSize(this.width, this.height);
@@ -357,7 +354,7 @@ var ngX;
                 configurable: true
             });
             Object.defineProperty(Youtube.prototype, "width", {
-                get: function () { return this._width; },
+                get: function () { return this._width || "900"; },
                 set: function (value) {
                     if (value && value != this._width)
                         this.player.setSize(this.width, this.height);
@@ -367,7 +364,9 @@ var ngX;
                 configurable: true
             });
             Object.defineProperty(Youtube.prototype, "videoId", {
-                get: function () { return this._videoId; },
+                get: function () {
+                    return this._videoId || "KOOT7BArVHQ";
+                },
                 set: function (value) {
                     if (value && value != this._videoId)
                         this.player.cueVideoById(value);
@@ -384,7 +383,7 @@ var ngX;
             component: Youtube,
             inputs: ["height", "width", "videoId"],
             providers: ["$element", "$scope", "$window"],
-            styles: [""].join(" /n "),
+            styles: [".youtube { }"].join(" /n "),
             template: ["<div></div>"].join(" ")
         });
     })(components = ngX.components || (ngX.components = {}));

@@ -17,21 +17,16 @@
              firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
          }
 
-         public onYouTubeIFrameApiReady = () => {
-             alert("works");
-
-             this.player = new YT.Player(this.$element.children()[0], {
+         public onYouTubeIFrameApiReady = () => {             
+             this.player = new YT.Player(this.$element[0], {
                  playerVars: {
                      autoplay: 0,
-                     //html5: 1,
                      theme: "light",
-                     //modesbranding: 0,
                      color: "white",
                      iv_load_policy: 3,
                      showinfo: 1,
                      controls: 1
                  },
-
                  height: this.height,
                  width: this.width,
                  videoId: this.videoId,
@@ -42,7 +37,7 @@
 
          private _height: string;
 
-         public get height() { return this._height; }
+         public get height() { return this._height || "600"; }
 
          public set height(value: string) {
              if (value && value != this._height)
@@ -53,7 +48,7 @@
 
          private _width: string;
 
-         public get width() { return this._width; }
+         public get width() { return this._width || "900"; }
 
          public set width(value: string) {
              if (value && value != this._width)
@@ -64,7 +59,9 @@
 
          private _videoId: string;
 
-         public get videoId() { return this._videoId; }
+         public get videoId() {
+             return this._videoId || "KOOT7BArVHQ";
+         }
 
          public set videoId(value: string) {
 
@@ -81,7 +78,7 @@
          component: Youtube,
          inputs:["height","width","videoId"],
          providers: ["$element","$scope","$window"],
-         styles: [""].join(" /n "),
+         styles: [".youtube { }"].join(" /n "),
          template: ["<div></div>"].join(" ")
      });
  }
