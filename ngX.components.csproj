@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="examples\listDetail\index.html" />
+    <Content Include="examples\youtube\index.html" />
     <Content Include="node_modules\ng-x\dist\ngX.js" />
     <Content Include="node_modules\ng-x\dist\ngX.min.js">
       <DependentUpon>ngX.js</DependentUpon>
@@ -90,16 +91,21 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="src\components\footer.ts" />
     <TypeScriptCompile Include="src\components\hamburgerButton.ts" />
+    <TypeScriptCompile Include="src\components\header.ts" />
     <TypeScriptCompile Include="src\components\listDetail.ts" />
+    <TypeScriptCompile Include="src\components\loginForm.ts" />
     <TypeScriptCompile Include="src\components\rotator.ts" />
     <TypeScriptCompile Include="src\components\virtualFor.ts" />
+    <TypeScriptCompile Include="src\components\youtube.ts" />
     <TypeScriptCompile Include="src\ngX.components.module.ts" />
     <TypeScriptCompile Include="typings\angularjs\angular.d.ts" />
     <TypeScriptCompile Include="typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="typings\ngX\ngX.d.ts" />
     <TypeScriptCompile Include="typings\tsd.d.ts" />
     <TypeScriptCompile Include="typings\typeScriptApp.d.ts" />
+    <TypeScriptCompile Include="typings\youtube\youtube.d.ts" />
   </ItemGroup>
   <ItemGroup />
   <PropertyGroup>

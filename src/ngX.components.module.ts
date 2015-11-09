@@ -1,1 +1,1 @@
-﻿//angular.module("ngX.components", ["ngX"]);
+﻿angular.module("ngX.components", ["ngX"]);

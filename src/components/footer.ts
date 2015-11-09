@@ -2,14 +2,14 @@
 
     ngX.Component({
         module: "ngX.components",
-        selector: "hamburger-button",
+        selector: "ng-x-footer",
         styles: [
             ".ng-x-footer {",
             "font-family: Arial;",
             "background-color: #212121; color: #ccc; padding: 10px; height: 50px;",
             "}"
         ].join(" \n "),
-        template: "<div class='hamburger-button'></div>"
+        template: "<div class='ng-x-footer'></div>"
     });
 
 }

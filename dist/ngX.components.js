@@ -1,4 +1,4 @@
-//angular.module("ngX.components", ["ngX"]);
+angular.module("ngX.components", ["ngX"]);
 
 //# sourceMappingURL=ngX.components.module.js.map
 
@@ -6,18 +6,61 @@ var ngX;
 (function (ngX) {
     var components;
     (function (components) {
-        /**
-         * @name HamburgerButton
-         */
-        var HamburgerButton = (function () {
-            function HamburgerButton() {
-            }
-            return HamburgerButton;
-        })();
+        ngX.Component({
+            module: "ngX.components",
+            selector: "ng-x-footer",
+            styles: [
+                ".ng-x-footer {",
+                "font-family: Arial;",
+                "background-color: #212121; color: #ccc; padding: 10px; height: 50px;",
+                "}"
+            ].join(" \n "),
+            template: "<div class='ng-x-footer'></div>"
+        });
+    })(components = ngX.components || (ngX.components = {}));
+})(ngX || (ngX = {}));
+
+//# sourceMappingURL=footer.js.map
+
+var ngX;
+(function (ngX) {
+    var components;
+    (function (components) {
+        ngX.Component({
+            module: "ngX.components",
+            selector: "hamburger-button",
+            styles: [
+                ".ng-x-footer {",
+                "font-family: Arial;",
+                "background-color: #212121; color: #ccc; padding: 10px; height: 50px;",
+                "}"
+            ].join(" \n "),
+            template: "<div class='hamburger-button'></div>"
+        });
     })(components = ngX.components || (ngX.components = {}));
 })(ngX || (ngX = {}));
 
 //# sourceMappingURL=hamburgerButton.js.map
+
+var ngX;
+(function (ngX) {
+    var components;
+    (function (components) {
+        ngX.Component({
+            module: "ngX.components",
+            selector: "ng-x-header",
+            styles: [
+                ".ng-x-header {",
+                "font-family: Arial;",
+                "background-color: #212121; color: #ccc; padding: 10px; height: 50px;",
+                "}"
+            ].join(" \n "),
+            template: "<div class='ng-x-header'></div>"
+        });
+    })(components = ngX.components || (ngX.components = {}));
+})(ngX || (ngX = {}));
+
+//# sourceMappingURL=header.js.map
 
 var ngX;
 (function (ngX) {
@@ -93,6 +136,10 @@ var ngX;
 })(ngX || (ngX = {}));
 
 //# sourceMappingURL=listDetail.js.map
+
+
+
+//# sourceMappingURL=loginForm.js.map
 
 var ngX;
 (function (ngX) {
@@ -259,3 +306,86 @@ var ngX;
 
 
 //# sourceMappingURL=virtualFor.js.map
+
+var ngX;
+(function (ngX) {
+    var components;
+    (function (components) {
+        var Youtube = (function () {
+            function Youtube($element, $scope, $window) {
+                var _this = this;
+                this.$element = $element;
+                this.$scope = $scope;
+                this.$window = $window;
+                this.onInit = function () {
+                    _this.insertYoutubeScriptTag();
+                    _this.$window.onYouTubeIframeAPIReady = _this.onYouTubeIFrameApiReady;
+                };
+                this.insertYoutubeScriptTag = function () {
+                    var tag = document.createElement('script');
+                    tag.src = "https://www.youtube.com/iframe_api";
+                    var firstScriptTag = document.getElementsByTagName('script')[0];
+                    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+                };
+                this.onYouTubeIFrameApiReady = function () {
+                    _this.player = new YT.Player(_this.$element.children()[0], {
+                        playerVars: {
+                            autoplay: 0,
+                            //html5: 1,
+                            theme: "light",
+                            //modesbranding: 0,
+                            color: "white",
+                            iv_load_policy: 3,
+                            showinfo: 1,
+                            controls: 1
+                        },
+                        height: _this.height,
+                        width: _this.width,
+                        videoId: _this.videoId,
+                    });
+                };
+            }
+            Object.defineProperty(Youtube.prototype, "height", {
+                get: function () { return this._height; },
+                set: function (value) {
+                    if (value && value != this._height)
+                        this.player.setSize(this.width, this.height);
+                    this._height = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Youtube.prototype, "width", {
+                get: function () { return this._width; },
+                set: function (value) {
+                    if (value && value != this._width)
+                        this.player.setSize(this.width, this.height);
+                    this._width = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Youtube.prototype, "videoId", {
+                get: function () { return this._videoId; },
+                set: function (value) {
+                    if (value && value != this._videoId)
+                        this.player.cueVideoById(value);
+                    this._videoId = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            return Youtube;
+        })();
+        ngX.Component({
+            selector: "youtube",
+            component: Youtube,
+            inputs: ["height", "width", "videoId"],
+            providers: ["$element", "$scope", "$window"],
+            styles: [""].join(" /n "),
+            template: ["<div></div>"].join(" ")
+        });
+    })(components = ngX.components || (ngX.components = {}));
+})(ngX || (ngX = {}));
+
+//# sourceMappingURL=youtube.js.map
