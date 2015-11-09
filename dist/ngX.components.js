@@ -328,6 +328,7 @@ var ngX;
                     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
                 };
                 this.onYouTubeIFrameApiReady = function () {
+                    alert("works");
                     _this.player = new YT.Player(_this.$element.children()[0], {
                         playerVars: {
                             autoplay: 0,
@@ -378,6 +379,7 @@ var ngX;
             return Youtube;
         })();
         ngX.Component({
+            module: "ngX.components",
             selector: "youtube",
             component: Youtube,
             inputs: ["height", "width", "videoId"],

@@ -18,6 +18,8 @@
          }
 
          public onYouTubeIFrameApiReady = () => {
+             alert("works");
+
              this.player = new YT.Player(this.$element.children()[0], {
                  playerVars: {
                      autoplay: 0,
@@ -74,6 +76,7 @@
      }
 
      ngX.Component({
+         module:"ngX.components",
          selector: "youtube",
          component: Youtube,
          inputs:["height","width","videoId"],
