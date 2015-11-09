@@ -1,13 +1,11 @@
 ﻿ module ngX.components {
      
      class Youtube {
-         constructor(private $element: any, private $scope:any, private $window:any) {
-             
-         }
+         constructor(private $element: ng.IAugmentedJQuery, private $scope:ng.IScope, private $window:ng.IWindowService) { }
 
          public onInit = () => {
              this.insertYoutubeScriptTag();
-             this.$window.onYouTubeIframeAPIReady = this.onYouTubeIFrameApiReady;
+             (<any>this.$window).onYouTubeIframeAPIReady = this.onYouTubeIFrameApiReady;
          }
 
          public insertYoutubeScriptTag = () => {
@@ -17,8 +15,8 @@
              firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
          }
 
-         public onYouTubeIFrameApiReady = () => {             
-             this.player = new YT.Player(this.$element[0], {
+         public onYouTubeIFrameApiReady = () => {                       
+             this.player = new YT.Player((<any>this.$element[0]), {
                  playerVars: {
                      autoplay: 0,
                      theme: "light",
@@ -37,10 +35,10 @@
 
          private _height: string;
 
-         public get height() { return this._height || "600"; }
+         public get height() { return this._height; }
 
          public set height(value: string) {
-             if (value && value != this._height)
+             if (value && this._height && value != this._height)
                  this.player.setSize(this.width, this.height);
 
              this._height = value;
@@ -48,10 +46,10 @@
 
          private _width: string;
 
-         public get width() { return this._width || "900"; }
+         public get width() { return this._width; }
 
          public set width(value: string) {
-             if (value && value != this._width)
+             if (value && this._width && value != this._width)
                  this.player.setSize(this.width, this.height);
 
              this._width = value;
@@ -59,17 +57,15 @@
 
          private _videoId: string;
 
-         public get videoId() {
-             return this._videoId || "KOOT7BArVHQ";
-         }
+         public get videoId() { return this._videoId; }
 
          public set videoId(value: string) {
-
-             if (value && value != this._videoId)
+             if (value && this._videoId && value != this._videoId)
                  this.player.cueVideoById(value);
 
              this._videoId = value;
          }
+
      }
 
      ngX.Component({
@@ -79,6 +75,6 @@
          inputs:["height","width","videoId"],
          providers: ["$element","$scope","$window"],
          styles: [".youtube { }"].join(" /n "),
-         template: ["<div></div>"].join(" ")
+         template: ["<div class='youtube'></div>"].join(" ")
      });
  }

@@ -344,9 +344,9 @@ var ngX;
                 };
             }
             Object.defineProperty(Youtube.prototype, "height", {
-                get: function () { return this._height || "600"; },
+                get: function () { return this._height; },
                 set: function (value) {
-                    if (value && value != this._height)
+                    if (value && this._height && value != this._height)
                         this.player.setSize(this.width, this.height);
                     this._height = value;
                 },
@@ -354,9 +354,9 @@ var ngX;
                 configurable: true
             });
             Object.defineProperty(Youtube.prototype, "width", {
-                get: function () { return this._width || "900"; },
+                get: function () { return this._width; },
                 set: function (value) {
-                    if (value && value != this._width)
+                    if (value && this._width && value != this._width)
                         this.player.setSize(this.width, this.height);
                     this._width = value;
                 },
@@ -364,11 +364,9 @@ var ngX;
                 configurable: true
             });
             Object.defineProperty(Youtube.prototype, "videoId", {
-                get: function () {
-                    return this._videoId || "KOOT7BArVHQ";
-                },
+                get: function () { return this._videoId; },
                 set: function (value) {
-                    if (value && value != this._videoId)
+                    if (value && this._videoId && value != this._videoId)
                         this.player.cueVideoById(value);
                     this._videoId = value;
                 },
@@ -384,7 +382,7 @@ var ngX;
             inputs: ["height", "width", "videoId"],
             providers: ["$element", "$scope", "$window"],
             styles: [".youtube { }"].join(" /n "),
-            template: ["<div></div>"].join(" ")
+            template: ["<div class='youtube'></div>"].join(" ")
         });
     })(components = ngX.components || (ngX.components = {}));
 })(ngX || (ngX = {}));
