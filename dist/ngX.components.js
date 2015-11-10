@@ -150,7 +150,7 @@ var ngX;
          * @module ngX.components
          */
         var Rotator = (function () {
-            function Rotator($attrs, $compile, $element, $http, $interval, $q, $scope, $timeout, $transclude, getHtml, getX, translateX, translateXAsync) {
+            function Rotator($attrs, $compile, $element, $http, $interval, $q, $scope, $timeout, $transclude, getX, translateX, translateXAsync) {
                 var _this = this;
                 this.$attrs = $attrs;
                 this.$compile = $compile;
@@ -161,38 +161,33 @@ var ngX;
                 this.$scope = $scope;
                 this.$timeout = $timeout;
                 this.$transclude = $transclude;
-                this.getHtml = getHtml;
                 this.getX = getX;
                 this.translateX = translateX;
                 this.translateXAsync = translateXAsync;
                 this.onInit = function () {
                     _this.$element.find(".view-port").css("width", _this.width);
-                    _this.$transclude(_this.$scope, function (clone) {
-                        _this.clone = clone;
-                        var fragment = document.createDocumentFragment();
-                        var template = _this.getHtml(_this.clone[0].children[0], true);
-                        for (var i = 0; i < _this.items.length; i++) {
-                            var childScope = _this.$scope.$new(true);
-                            childScope[_this.$attrs["rotatorForName"] || "rotatorItem"] = _this.items[i];
-                            childScope.width = _this.width;
-                            childScope.height = _this.height;
-                            childScope.$$index = i;
-                            childScope.$$isFirst = (i === 0);
-                            childScope.$$isLast = (i === _this.items.length - 1);
-                            var itemContent = _this.$compile(angular.element(template))(childScope);
-                            itemContent.addClass("slide");
-                            fragment.appendChild(itemContent[0]);
-                        }
-                        _this.containerNavtiveElement.appendChild(fragment);
-                    });
+                    var fragment = document.createDocumentFragment();
+                    for (var i = 0; i < _this.items.length; i++) {
+                        var childScope = _this.$scope.$new(true);
+                        childScope[_this.$attrs["rotatorForName"] || "rotatorItem"] = _this.items[i];
+                        childScope.width = _this.width;
+                        childScope.height = _this.height;
+                        childScope.$$index = i;
+                        childScope.$$isFirst = (i === 0);
+                        childScope.$$isLast = (i === _this.items.length - 1);
+                        var itemContent = _this.$compile(angular.element(_this.template))(childScope);
+                        itemContent.addClass("slide");
+                        fragment.appendChild(itemContent[0]);
+                    }
+                    _this.containerNavtiveElement.appendChild(fragment);
                 };
-                this.onNextAsync = function () {
+                this.onPreviousAsync = function () {
                     var deferred = _this.$q.defer();
                     if (!_this.isAnimating) {
                         var promises = [];
                         _this.isAnimating = true;
                         for (var i = 0; i < _this.slideNavtiveElements.length; i++) {
-                            promises.push(_this.translateXAsync({ element: _this.slideNavtiveElements[i], x: 100 }));
+                            promises.push(_this.translateXAsync({ element: _this.slideNavtiveElements[i], x: (_this.getX(_this.slideNavtiveElements[i]) + Number(_this.width)) }));
                         }
                         _this.$q.all(promises).then(function () {
                             _this.isAnimating = false;
@@ -204,13 +199,13 @@ var ngX;
                     }
                     return deferred.promise;
                 };
-                this.onPreviousAsync = function () {
+                this.onNextAsync = function () {
                     var deferred = _this.$q.defer();
                     if (!_this.isAnimating) {
                         var promises = [];
                         _this.isAnimating = true;
-                        for (var i = 0; i < _this.slideNavtiveElements.length; i++) {
-                            promises.push(_this.translateXAsync({ element: _this.slideNavtiveElements[i], x: 100 }));
+                        for (var i = _this.slideNavtiveElements.length - 1; i > -1; i--) {
+                            promises.push(_this.translateXAsync({ element: _this.slideNavtiveElements[i], x: (_this.getX(_this.slideNavtiveElements[i]) - Number(_this.width)) }));
                         }
                         _this.$q.all(promises).then(function () {
                             _this.isAnimating = false;
@@ -233,6 +228,16 @@ var ngX;
                     delete _this.clone;
                 };
             }
+            Object.defineProperty(Rotator.prototype, "slideNavtiveElements", {
+                get: function () { return this.containerNavtiveElement.children; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Rotator.prototype, "template", {
+                get: function () { return this.clone.find("slide")[0].innerHTML; },
+                enumerable: true,
+                configurable: true
+            });
             Object.defineProperty(Rotator.prototype, "containerNavtiveElement", {
                 get: function () { return this.$element.find(".container")[0]; },
                 enumerable: true,
@@ -294,7 +299,6 @@ var ngX;
                 "$scope",
                 "$timeout",
                 "$transclude",
-                "getHtml",
                 "getX",
                 "translateX",
                 "translateXAsync"
@@ -313,6 +317,10 @@ var ngX;
 })(ngX || (ngX = {}));
 
 //# sourceMappingURL=rotator.js.map
+
+
+
+//# sourceMappingURL=tabs.js.map
 
 
 

@@ -15,46 +15,37 @@
             private $scope: ng.IScope,
             private $timeout: ng.ITimeoutService,
             private $transclude: Function,
-            private getHtml: Function,
             private getX: Function,
             private translateX: Function,
-            private translateXAsync: Function) {
-
-        }
+            private translateXAsync: Function) { }
 
         private onInit = () => {
 
             this.$element.find(".view-port").css("width", this.width);
 
-            this.$transclude(this.$scope, (clone: ng.IAugmentedJQuery) => {
-                this.clone = clone;
-                var fragment = document.createDocumentFragment();
-                var template = this.getHtml(<HTMLElement>this.clone[0].children[0], true);
-                for (var i = 0; i < this.items.length; i++) {
-                    var childScope: any = this.$scope.$new(true);
-                    childScope[this.$attrs["rotatorForName"] || "rotatorItem"] = this.items[i];
-                    childScope.width = this.width;
-                    childScope.height = this.height;
-                    childScope.$$index = i;
-                    childScope.$$isFirst = (i === 0);
-                    childScope.$$isLast = (i === this.items.length - 1);
-                    var itemContent = this.$compile(angular.element(template))(childScope);
-                    itemContent.addClass("slide");
-                    fragment.appendChild(itemContent[0]);
-                }
-                this.containerNavtiveElement.appendChild(fragment);
-            });
-
-
+            var fragment = document.createDocumentFragment();
+            for (var i = 0; i < this.items.length; i++) {
+                var childScope: any = this.$scope.$new(true);
+                childScope[this.$attrs["rotatorForName"] || "rotatorItem"] = this.items[i];
+                childScope.width = this.width;
+                childScope.height = this.height;
+                childScope.$$index = i;
+                childScope.$$isFirst = (i === 0);
+                childScope.$$isLast = (i === this.items.length - 1);
+                var itemContent = this.$compile(angular.element(this.template))(childScope);
+                itemContent.addClass("slide");
+                fragment.appendChild(itemContent[0]);
+            }
+            this.containerNavtiveElement.appendChild(fragment);
         }
 
-        public onNextAsync = () => {
+        public onPreviousAsync = () => {
             var deferred = this.$q.defer();
             if (!this.isAnimating) {
                 var promises = [];
                 this.isAnimating = true;
                 for (var i = 0; i < this.slideNavtiveElements.length; i++) {
-                    promises.push(this.translateXAsync({ element: this.slideNavtiveElements[i], x: 100 }));
+                    promises.push(this.translateXAsync({ element: this.slideNavtiveElements[i], x: (this.getX(this.slideNavtiveElements[i]) + Number(this.width)) }));
                 }
                 this.$q.all(promises).then(() => {
                     this.isAnimating = false;
@@ -66,13 +57,13 @@
             return deferred.promise;
         }
 
-        public onPreviousAsync = () => {
+        public onNextAsync = () => {
             var deferred = this.$q.defer();
             if (!this.isAnimating) {
                 var promises = [];
                 this.isAnimating = true;
-                for (var i = 0; i < this.slideNavtiveElements.length; i++) {
-                    promises.push(this.translateXAsync({ element: this.slideNavtiveElements[i], x: 100 }));
+                for (var i = this.slideNavtiveElements.length -1; i > -1; i--) {
+                    promises.push(this.translateXAsync({ element: this.slideNavtiveElements[i], x: (this.getX(this.slideNavtiveElements[i]) - Number(this.width)) }));
                 }
                 this.$q.all(promises).then(() => {
                     this.isAnimating = false;
@@ -95,11 +86,13 @@
             delete this.clone;
         }
 
-        private isAnimating: boolean;
-
-        private slideNavtiveElements: any;
+        private get slideNavtiveElements() { return this.containerNavtiveElement.children; }
 
         private clone: any;
+
+        private get template() { return this.clone.find("slide")[0].innerHTML; }
+
+        private isAnimating:boolean;
 
         private get containerNavtiveElement() { return this.$element.find(".container")[0]; } 
 
@@ -172,7 +165,6 @@
             "$scope",
             "$timeout",
             "$transclude",
-            "getHtml",
             "getX",
             "translateX",
             "translateXAsync"
