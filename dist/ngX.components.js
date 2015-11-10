@@ -147,7 +147,7 @@ var ngX;
     (function (components) {
         /**
          * @name Rotator
-         * @
+         * @module ngX.components
          */
         var Rotator = (function () {
             function Rotator($attrs, $compile, $element, $http, $interval, $q, $scope, $timeout, $transclude, getHtml, getX, translateX, translateXAsync) {
@@ -166,6 +166,7 @@ var ngX;
                 this.translateX = translateX;
                 this.translateXAsync = translateXAsync;
                 this.onInit = function () {
+                    _this.$element.find(".view-port").css("width", _this.width);
                     _this.$transclude(_this.$scope, function (clone) {
                         _this.clone = clone;
                         var fragment = document.createDocumentFragment();
@@ -173,6 +174,8 @@ var ngX;
                         for (var i = 0; i < _this.items.length; i++) {
                             var childScope = _this.$scope.$new(true);
                             childScope[_this.$attrs["rotatorForName"] || "rotatorItem"] = _this.items[i];
+                            childScope.width = _this.width;
+                            childScope.height = _this.height;
                             childScope.$$index = i;
                             childScope.$$isFirst = (i === 0);
                             childScope.$$isLast = (i === _this.items.length - 1);
@@ -231,9 +234,7 @@ var ngX;
                 };
             }
             Object.defineProperty(Rotator.prototype, "containerNavtiveElement", {
-                get: function () {
-                    return this.$element.find(".container")[0];
-                },
+                get: function () { return this.$element.find(".container")[0]; },
                 enumerable: true,
                 configurable: true
             });
@@ -246,9 +247,11 @@ var ngX;
             component: Rotator,
             transclude: "element",
             inputs: [
+                "height",
                 "items",
                 "nextButtonImageUrl",
-                "previousButtonImageUrl"
+                "previousButtonImageUrl",
+                "width"
             ],
             styles: [
                 " .rotator .slide { ",
@@ -259,7 +262,6 @@ var ngX;
                 "   position: relative; ",
                 "   overflow-x: hidden; ",
                 "   overflow-y: hidden; ",
-                "   width: 750px; ",
                 " } ",
                 " .rotator .view-port .previous-arrow img, ",
                 " .rotator .view-port .next-arrow img { ",

@@ -24,6 +24,8 @@
 
         private onInit = () => {
 
+            this.$element.find(".view-port").css("width", this.width);
+
             this.$transclude(this.$scope, (clone: ng.IAugmentedJQuery) => {
                 this.clone = clone;
                 var fragment = document.createDocumentFragment();
@@ -31,6 +33,8 @@
                 for (var i = 0; i < this.items.length; i++) {
                     var childScope: any = this.$scope.$new(true);
                     childScope[this.$attrs["rotatorForName"] || "rotatorItem"] = this.items[i];
+                    childScope.width = this.width;
+                    childScope.height = this.height;
                     childScope.$$index = i;
                     childScope.$$isFirst = (i === 0);
                     childScope.$$isLast = (i === this.items.length - 1);
@@ -99,7 +103,11 @@
 
         private get containerNavtiveElement() { return this.$element.find(".container")[0]; } 
 
-        private items:any;
+        private items: any;
+
+        private width: string;
+
+        private height:string;
     }
 
     ngX.Component({
@@ -108,9 +116,11 @@
         component: Rotator,
         transclude:"element",
         inputs: [
+            "height",
             "items",
             "nextButtonImageUrl",
-            "previousButtonImageUrl"            
+            "previousButtonImageUrl",
+            "width"           
         ],
         styles: [
             " .rotator .slide { ",
@@ -123,7 +133,6 @@
             "   position: relative; ",
             "   overflow-x: hidden; ",
             "   overflow-y: hidden; ",
-            "   width: 750px; ",
             " } ",
 
             " .rotator .view-port .previous-arrow img, ",
