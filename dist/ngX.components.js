@@ -230,6 +230,13 @@ var ngX;
                     delete _this.clone;
                 };
             }
+            Object.defineProperty(Rotator.prototype, "containerNavtiveElement", {
+                get: function () {
+                    return this.$element.find(".container")[0];
+                },
+                enumerable: true,
+                configurable: true
+            });
             return Rotator;
         })();
         components.Rotator = Rotator;
@@ -237,9 +244,11 @@ var ngX;
             module: "ngX.components",
             selector: "rotator",
             component: Rotator,
+            transclude: "element",
             inputs: [
-                "previousButtonImageUrl",
-                "nextButtonImageUrl"
+                "items",
+                "nextButtonImageUrl",
+                "previousButtonImageUrl"
             ],
             styles: [
                 " .rotator .slide { ",

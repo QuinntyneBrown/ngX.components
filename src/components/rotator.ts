@@ -2,7 +2,7 @@
     
     /**
      * @name Rotator
-     * @
+     * @module ngX.components
      */
     export class Rotator {
         constructor(
@@ -97,19 +97,20 @@
 
         private clone: any;
 
-        private containerNavtiveElement: any;
+        private get containerNavtiveElement() { return this.$element.find(".container")[0]; } 
 
         private items:any;
-
     }
 
     ngX.Component({
         module:"ngX.components",
         selector: "rotator",
         component: Rotator,
+        transclude:"element",
         inputs: [
-            "previousButtonImageUrl",
-            "nextButtonImageUrl"
+            "items",
+            "nextButtonImageUrl",
+            "previousButtonImageUrl"            
         ],
         styles: [
             " .rotator .slide { ",
