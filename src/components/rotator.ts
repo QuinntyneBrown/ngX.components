@@ -11,6 +11,7 @@
             private $element: ng.IAugmentedJQuery,
             private $http: ng.IHttpService,
             private $interval: ng.IIntervalService,
+            private $location:ng.ILocationService,
             private $q: ng.IQService,
             private $scope: ng.IScope,
             private $timeout: ng.ITimeoutService,
@@ -20,7 +21,7 @@
             private translateXAsync: Function) { }
 
         private onInit = () => {
-
+            
             this.$element.find(".view-port").css("width", this.width);
 
             var fragment = document.createDocumentFragment();
@@ -48,6 +49,10 @@
                     promises.push(this.translateXAsync({ element: this.slideNavtiveElements[i], x: (this.getX(this.slideNavtiveElements[i]) + Number(this.width)) }));
                 }
                 this.$q.all(promises).then(() => {
+                    /**
+                     * move tail to head
+                     */
+                    this.updateCurrentIndex({ currentIndex: this.currentIndex -1 });
                     this.isAnimating = false;
                     deferred.resolve();
                 });
@@ -66,6 +71,10 @@
                     promises.push(this.translateXAsync({ element: this.slideNavtiveElements[i], x: (this.getX(this.slideNavtiveElements[i]) - Number(this.width)) }));
                 }
                 this.$q.all(promises).then(() => {
+                    /**
+                     * move the head to tail
+                     */
+                    this.updateCurrentIndex({ currentIndex: this.currentIndex + 1 });
                     this.isAnimating = false;
                     deferred.resolve();
                 });
@@ -86,9 +95,22 @@
             delete this.clone;
         }
 
+        public updateCurrentIndex = (options: any) => {
+            this.currentIndex = options.currentIndex;
+            this.$scope.$emit("rotatorUpdate", { scope: this.$scope });
+            var url = (<any>angular.element(this.slideNavtiveElements[this.currentIndex]).scope())[this.$attrs["rotatorForName"] || "rotatorItem"][this.$attrs["querySearchField"] || 'guid'];
+            this.$location.search(this.$attrs["querySearchField"] || 'guid', url);
+        }
+
+        public turnOffTransitions = () => { this.$element.addClass("notransition"); }
+
+        public turnOnTransitions() { this.$element.removeClass("notransition"); }
+
         private get slideNavtiveElements() { return this.containerNavtiveElement.children; }
 
         private clone: any;
+
+        private currentIndex:number = 0;
 
         private get template() { return this.clone.find("slide")[0].innerHTML; }
 
@@ -119,7 +141,7 @@
             " .rotator .slide { ",
             "   transition: transform 0.5s cubic-bezier(0.1, 0.1, 0.25, 0.9); } ",
 
-            " .rotator .notransistion.slide { ",
+            " .rotator.notransition .slide { ",
             "  transition: none !important; } ",
 
             " .rotator .view-port { ",
@@ -161,6 +183,7 @@
             "$element",
             "$http",
             "$interval",
+            "$location",
             "$q",
             "$scope",
             "$timeout",

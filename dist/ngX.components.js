@@ -150,13 +150,14 @@ var ngX;
          * @module ngX.components
          */
         var Rotator = (function () {
-            function Rotator($attrs, $compile, $element, $http, $interval, $q, $scope, $timeout, $transclude, getX, translateX, translateXAsync) {
+            function Rotator($attrs, $compile, $element, $http, $interval, $location, $q, $scope, $timeout, $transclude, getX, translateX, translateXAsync) {
                 var _this = this;
                 this.$attrs = $attrs;
                 this.$compile = $compile;
                 this.$element = $element;
                 this.$http = $http;
                 this.$interval = $interval;
+                this.$location = $location;
                 this.$q = $q;
                 this.$scope = $scope;
                 this.$timeout = $timeout;
@@ -190,6 +191,10 @@ var ngX;
                             promises.push(_this.translateXAsync({ element: _this.slideNavtiveElements[i], x: (_this.getX(_this.slideNavtiveElements[i]) + Number(_this.width)) }));
                         }
                         _this.$q.all(promises).then(function () {
+                            /**
+                             * move tail to head
+                             */
+                            _this.updateCurrentIndex({ currentIndex: _this.currentIndex - 1 });
                             _this.isAnimating = false;
                             deferred.resolve();
                         });
@@ -208,6 +213,10 @@ var ngX;
                             promises.push(_this.translateXAsync({ element: _this.slideNavtiveElements[i], x: (_this.getX(_this.slideNavtiveElements[i]) - Number(_this.width)) }));
                         }
                         _this.$q.all(promises).then(function () {
+                            /**
+                             * move the head to tail
+                             */
+                            _this.updateCurrentIndex({ currentIndex: _this.currentIndex + 1 });
                             _this.isAnimating = false;
                             deferred.resolve();
                         });
@@ -227,7 +236,16 @@ var ngX;
                     delete _this.$element;
                     delete _this.clone;
                 };
+                this.updateCurrentIndex = function (options) {
+                    _this.currentIndex = options.currentIndex;
+                    _this.$scope.$emit("rotatorUpdate", { scope: _this.$scope });
+                    var url = angular.element(_this.slideNavtiveElements[_this.currentIndex]).scope()[_this.$attrs["rotatorForName"] || "rotatorItem"][_this.$attrs["querySearchField"] || 'guid'];
+                    _this.$location.search(_this.$attrs["querySearchField"] || 'guid', url);
+                };
+                this.turnOffTransitions = function () { _this.$element.addClass("notransition"); };
+                this.currentIndex = 0;
             }
+            Rotator.prototype.turnOnTransitions = function () { this.$element.removeClass("notransition"); };
             Object.defineProperty(Rotator.prototype, "slideNavtiveElements", {
                 get: function () { return this.containerNavtiveElement.children; },
                 enumerable: true,
@@ -261,7 +279,7 @@ var ngX;
             styles: [
                 " .rotator .slide { ",
                 "   transition: transform 0.5s cubic-bezier(0.1, 0.1, 0.25, 0.9); } ",
-                " .rotator .notransistion.slide { ",
+                " .rotator.notransition .slide { ",
                 "  transition: none !important; } ",
                 " .rotator .view-port { ",
                 "   position: relative; ",
@@ -295,6 +313,7 @@ var ngX;
                 "$element",
                 "$http",
                 "$interval",
+                "$location",
                 "$q",
                 "$scope",
                 "$timeout",

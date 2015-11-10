@@ -7,19 +7,21 @@
 
     <div>
         
-        <rotator items="vm.photos"
+        <rotator id="featured"
+                 items="vm.photos"
                  rotator-for-name="photo"
                  next-button-image-url="'../../assets/images/rotator_button_next.png'"
                  previous-button-image-url="'../../assets/images/rotator_button_prev.png'"
+                 query-search-field="imageUrl"
                  width="'1200'"
                  height="'800'">
-            
+
             <slide>
                 <img src="{{ photo.imageUrl }}" />
             </slide>
 
         </rotator>
-
+        
     </div>
 
     <script src="../../node_modules/jquery/dist/jquery.js"></script>
@@ -29,10 +31,14 @@
     <script src="../../dist/ngX.components.js"></script>
 
     <script>
-        function pageController() {
+        function pageController($scope) {
 
+            $scope.$on("rotatorUpdate", function(event,obj) {
+                console.log(obj.scope.vm.$attrs["id"] + " : " + obj.scope.vm.currentIndex);
+            });
             var self = this;
 
+            
             self.photos = [
                 { imageUrl: "../../assets/images/photo1.jpg" },
                 { imageUrl: "../../assets/images/photo2.jpg" },
@@ -46,7 +52,7 @@
             return self;
         }
 
-        angular.module("ngX.components").controller("pageController", [pageController]);
+        angular.module("ngX.components").controller("pageController", ["$scope",pageController]);
 
     </script>
 </body>

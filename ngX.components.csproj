@@ -109,6 +109,7 @@
     <TypeScriptCompile Include="src\components\listDetail.ts" />
     <TypeScriptCompile Include="src\components\loginForm.ts" />
     <TypeScriptCompile Include="src\components\rotator.ts" />
+    <TypeScriptCompile Include="src\components\tabs.ts" />
     <TypeScriptCompile Include="src\components\virtualFor.ts" />
     <TypeScriptCompile Include="src\components\youtube.ts" />
     <TypeScriptCompile Include="src\ngX.components.module.ts" />
