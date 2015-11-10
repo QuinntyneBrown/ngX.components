@@ -319,13 +319,25 @@ var ngX;
                 this.$window = $window;
                 this.guid = guid;
                 this.onInit = function () {
-                    _this.insertYoutubeScriptTag();
-                    _this.$window.onYouTubeIframeAPIReady = _this.onYouTubeIFrameApiReady;
+                    var scriptTag = document.getElementById("youtube-player");
+                    if (!scriptTag) {
+                        _this.insertYoutubeScriptTag();
+                    }
+                    if (scriptTag && !_this.$window.YT) {
+                        setTimeout(_this.onYouTubeIFrameApiReady, 300);
+                    }
+                    else if (scriptTag) {
+                        _this.onYouTubeIFrameApiReady();
+                    }
+                    else {
+                        _this.$window.onYouTubeIframeAPIReady = _this.onYouTubeIFrameApiReady;
+                    }
                 };
                 this.insertYoutubeScriptTag = function () {
                     var tag = document.createElement('script');
                     tag.src = "https://www.youtube.com/iframe_api";
                     var firstScriptTag = document.getElementsByTagName('script')[0];
+                    firstScriptTag.setAttribute("id", "youtube-player");
                     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
                 };
                 this.onYouTubeIFrameApiReady = function () {

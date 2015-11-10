@@ -7,15 +7,29 @@
              private guid:Function) { }
 
          public onInit = () => {
-            this.insertYoutubeScriptTag();
-            (<any>this.$window).onYouTubeIframeAPIReady = this.onYouTubeIFrameApiReady;
+
+             var scriptTag = document.getElementById("youtube-player");
+
+             if (!scriptTag) {
+                 this.insertYoutubeScriptTag();
+             }
+
+             if (scriptTag && !(<any>this.$window).YT) {
+                 setTimeout(this.onYouTubeIFrameApiReady, 300);
+             } else if(scriptTag) {
+                 this.onYouTubeIFrameApiReady();
+             }
+             else {
+                 (<any>this.$window).onYouTubeIframeAPIReady = this.onYouTubeIFrameApiReady;
+             }
          }
 
-         public insertYoutubeScriptTag = () => {             
-                 var tag = document.createElement('script');
-                 tag.src = "https://www.youtube.com/iframe_api";
-                 var firstScriptTag = document.getElementsByTagName('script')[0];
-                 firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+         public insertYoutubeScriptTag = () => {         
+            var tag = document.createElement('script');
+            tag.src = "https://www.youtube.com/iframe_api";
+            var firstScriptTag = document.getElementsByTagName('script')[0];
+            firstScriptTag.setAttribute("id", "youtube-player");
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);                    
          }
 
          public onYouTubeIFrameApiReady = () => {                                  
