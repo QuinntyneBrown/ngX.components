@@ -1,4 +1,4 @@
-﻿﻿module ngX.components {
+﻿﻿﻿module ngX.components {
     
     /**
      * @name Rotator
@@ -41,6 +41,7 @@
             }
 
 
+            this.currentIndex = 0;
 
             this.containerNavtiveElement.appendChild(fragment);
 
@@ -54,7 +55,7 @@
             setTimeout(() => {
                 this.turnOnTransitions();
             });
-            
+
         }
 
         private onLocationChangeSuccess = () => {
@@ -75,20 +76,14 @@
             return value;
         }
 
-        public onPreviousAsync = () => {
-            var index;
-            if (this.currentIndex === 0) {
-                index = this.items.length - 1;
-            } else {
-                index = this.currentIndex - 1;
-            }
-
-            return this.moveToIndexAsync({ index: index }).then(() => {
+        public onPreviousAsync = () => {            
+            return this.move({ x: (Number(this.width)) }).then(() => {
                 this.turnOffTransitions();
                 var desiredX = Number(this.width) * (-1);
                 var delta = desiredX - this.rendererdNodes[this.items.length - 1].offsetLeft;
                 this.translateX(this.rendererdNodes[this.items.length - 1].node, delta);
                 this.inTransition = true;
+                this.currentIndex = (this.currentIndex === 0) ? this.items.length : this.currentIndex - 1;
                 setTimeout(() => {
                     this.turnOnTransitions();
                     this.inTransition = false;
@@ -97,20 +92,13 @@
         }
 
         public onNextAsync = () => {
-
-            var index;
-            if (this.currentIndex === this.items.length - 1) {
-                index = 0;
-            } else {
-                index = this.currentIndex + 1;
-            }
-
-            return this.moveToIndexAsync({ index: index }).then(() => {
+            return this.move({ x: (-1) * (Number(this.width)) }).then(() => {
                 this.turnOffTransitions();
                 var desiredX = Number(this.width) * (this.items.length - 2);
                 var delta = desiredX - this.rendererdNodes[0].offsetLeft;
                 this.translateX(this.rendererdNodes[0].node, delta);
                 this.inTransition = true;
+                this.currentIndex = (this.currentIndex === this.items.length - 1) ? 0 : this.currentIndex + 1;
                 setTimeout(() => {
                     this.turnOnTransitions();
                     this.inTransition = false;
@@ -118,32 +106,30 @@
             });
         }
 
-        public moveToIndexAsync = (options: any) => {
-            var deferred = this.$q.defer();                    
+        public move = (options: any) => {
+            var deferred = this.$q.defer();
             if (!this.isAnimating && !this.inTransition) {
-                var deltaX = (-1) * (Number(this.width) * (Number(options.index) - Number(this.currentIndex)));
                 var promises = [];
                 this.isAnimating = true;
 
-                if (deltaX < 0) {
+                if (options.x < 0) {
                     for (var i = this.slideNavtiveElements.length - 1; i > -1; i--) {
-                        promises.push(this.translateXAsync({ element: this.slideNavtiveElements[i], x: (this.getX(this.slideNavtiveElements[i]) + deltaX) }));
+                        promises.push(this.translateXAsync({ element: this.slideNavtiveElements[i], x: (this.getX(this.slideNavtiveElements[i]) + options.x) }));
                     }
                 }
-                if (deltaX >= 0) {
+                if (options.x >= 0) {
                     for (var i = 0; i < this.slideNavtiveElements.length; i++) {
-                        promises.push(this.translateXAsync({ element: this.slideNavtiveElements[i], x: (this.getX(this.slideNavtiveElements[i]) + deltaX) }));
+                        promises.push(this.translateXAsync({ element: this.slideNavtiveElements[i], x: (this.getX(this.slideNavtiveElements[i]) + options.x) }));
                     }
                 }
                 this.$q.all(promises).then(() => {
-                    this.updateCurrentIndex({ currentIndex: options.index });
                     this.isAnimating = false;
                     deferred.resolve();
                 });
             } else {
                 deferred.reject();
             }
-            return deferred.promise;            
+            return deferred.promise;
         }
 
         public atBegining() { return this.currentIndex == 0; }
@@ -161,9 +147,6 @@
             delete this.clone;
         }
 
-        public updateCurrentIndex = (options: any) => {
-
-        }
 
         public turnOffTransitions = () => { this.$element.addClass("notransition"); }
 
@@ -173,7 +156,18 @@
 
         private clone: any;
 
-        private currentIndex: number = -1;
+        private _currentIndex: number = -1;
+
+        private get currentIndex() { return this._currentIndex; }
+
+        private set currentIndex(value: number) {
+
+            this._currentIndex = value;
+            this.$scope.$emit("componentUpdate", { scope: this.$scope });
+            var url = this.items[this.currentIndex][this.$attrs["querySearchField"] || 'id'];
+            this.$location.search(this.$attrs["querySearchField"] || 'id', url);
+
+        }
 
         private _template: string = null;
 
@@ -182,11 +176,11 @@
                 return this._template;
 
             if (this.$attrs["contentUrl"]) {
-                this._template = this.getFromUrlSync({ url: this.$attrs["contentUrl"] });                
+                this._template = this.getFromUrlSync({ url: this.$attrs["contentUrl"] });
             } else {
                 this._template = this.clone.find("content")[0].innerHTML;
             }
-            return this._template;            
+            return this._template;
         }
 
         private isAnimating: boolean;
@@ -201,7 +195,7 @@
 
         private height: string;
 
-        private get rendererdNodes () {
+        private get rendererdNodes() {
             var renderedNodes = [];
 
             for (var i = 0; i < this.slideNavtiveElements.length; i++) {
@@ -217,7 +211,7 @@
                 });
             }
 
-            return renderedNodes.sort((a:any, b:any) => {
+            return renderedNodes.sort((a: any, b: any) => {
                 return a.left - b.left;
             });
         }

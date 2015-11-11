@@ -181,6 +181,7 @@ var ngX;
                         itemContent.addClass("slide");
                         fragment.appendChild(itemContent[0]);
                     }
+                    _this.currentIndex = 0;
                     _this.containerNavtiveElement.appendChild(fragment);
                     _this.turnOffTransitions();
                     var desiredX = Number(_this.width) * (-1);
@@ -197,19 +198,13 @@ var ngX;
                     //}
                 };
                 this.onPreviousAsync = function () {
-                    var index;
-                    if (_this.currentIndex === 0) {
-                        index = _this.items.length - 1;
-                    }
-                    else {
-                        index = _this.currentIndex - 1;
-                    }
-                    return _this.moveToIndexAsync({ index: index }).then(function () {
+                    return _this.move({ x: (Number(_this.width)) }).then(function () {
                         _this.turnOffTransitions();
                         var desiredX = Number(_this.width) * (-1);
                         var delta = desiredX - _this.rendererdNodes[_this.items.length - 1].offsetLeft;
                         _this.translateX(_this.rendererdNodes[_this.items.length - 1].node, delta);
                         _this.inTransition = true;
+                        _this.currentIndex = (_this.currentIndex === 0) ? _this.items.length : _this.currentIndex - 1;
                         setTimeout(function () {
                             _this.turnOnTransitions();
                             _this.inTransition = false;
@@ -217,43 +212,35 @@ var ngX;
                     });
                 };
                 this.onNextAsync = function () {
-                    var index;
-                    if (_this.currentIndex === _this.items.length - 1) {
-                        index = 0;
-                    }
-                    else {
-                        index = _this.currentIndex + 1;
-                    }
-                    return _this.moveToIndexAsync({ index: index }).then(function () {
+                    return _this.move({ x: (-1) * (Number(_this.width)) }).then(function () {
                         _this.turnOffTransitions();
                         var desiredX = Number(_this.width) * (_this.items.length - 2);
                         var delta = desiredX - _this.rendererdNodes[0].offsetLeft;
                         _this.translateX(_this.rendererdNodes[0].node, delta);
                         _this.inTransition = true;
+                        _this.currentIndex = (_this.currentIndex === _this.items.length - 1) ? 0 : _this.currentIndex + 1;
                         setTimeout(function () {
                             _this.turnOnTransitions();
                             _this.inTransition = false;
                         }, 300);
                     });
                 };
-                this.moveToIndexAsync = function (options) {
+                this.move = function (options) {
                     var deferred = _this.$q.defer();
                     if (!_this.isAnimating && !_this.inTransition) {
-                        var deltaX = (-1) * (Number(_this.width) * (Number(options.index) - Number(_this.currentIndex)));
                         var promises = [];
                         _this.isAnimating = true;
-                        if (deltaX < 0) {
+                        if (options.x < 0) {
                             for (var i = _this.slideNavtiveElements.length - 1; i > -1; i--) {
-                                promises.push(_this.translateXAsync({ element: _this.slideNavtiveElements[i], x: (_this.getX(_this.slideNavtiveElements[i]) + deltaX) }));
+                                promises.push(_this.translateXAsync({ element: _this.slideNavtiveElements[i], x: (_this.getX(_this.slideNavtiveElements[i]) + options.x) }));
                             }
                         }
-                        if (deltaX >= 0) {
+                        if (options.x >= 0) {
                             for (var i = 0; i < _this.slideNavtiveElements.length; i++) {
-                                promises.push(_this.translateXAsync({ element: _this.slideNavtiveElements[i], x: (_this.getX(_this.slideNavtiveElements[i]) + deltaX) }));
+                                promises.push(_this.translateXAsync({ element: _this.slideNavtiveElements[i], x: (_this.getX(_this.slideNavtiveElements[i]) + options.x) }));
                             }
                         }
                         _this.$q.all(promises).then(function () {
-                            _this.updateCurrentIndex({ currentIndex: options.index });
                             _this.isAnimating = false;
                             deferred.resolve();
                         });
@@ -273,10 +260,8 @@ var ngX;
                     delete _this.$element;
                     delete _this.clone;
                 };
-                this.updateCurrentIndex = function (options) {
-                };
                 this.turnOffTransitions = function () { _this.$element.addClass("notransition"); };
-                this.currentIndex = -1;
+                this._currentIndex = -1;
                 this._template = null;
             }
             Object.defineProperty(Rotator.prototype, "queryStringParam", {
@@ -302,6 +287,17 @@ var ngX;
             Rotator.prototype.turnOnTransitions = function () { this.$element.removeClass("notransition"); };
             Object.defineProperty(Rotator.prototype, "slideNavtiveElements", {
                 get: function () { return this.containerNavtiveElement.children; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Rotator.prototype, "currentIndex", {
+                get: function () { return this._currentIndex; },
+                set: function (value) {
+                    this._currentIndex = value;
+                    this.$scope.$emit("componentUpdate", { scope: this.$scope });
+                    var url = this.items[this.currentIndex][this.$attrs["querySearchField"] || 'id'];
+                    this.$location.search(this.$attrs["querySearchField"] || 'id', url);
+                },
                 enumerable: true,
                 configurable: true
             });
