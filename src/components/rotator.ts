@@ -16,6 +16,7 @@
             private $scope: ng.IScope,
             private $timeout: ng.ITimeoutService,
             private $transclude: Function,
+            private getFromUrlSync: Function,
             private getX: Function,
             private translateX: Function,
             private translateXAsync: Function) { }
@@ -153,30 +154,15 @@
         private _template: string = null;
 
         private get template() {
-
             if (this._template != null)
                 return this._template;
 
             if (this.$attrs["slideTemplateUrl"]) {
-                var template = "";
-                var xhr = new XMLHttpRequest();
-                xhr.open("GET", this.$attrs["slideTemplateUrl"], false);
-                xhr.onload = function (e) {
-                    if (xhr.readyState === 4) {
-                        if (xhr.status === 200) {
-                            template = xhr.responseText;
-                        } else {
-                            console.error(xhr.statusText);
-                        }
-                    }
-                };
-                xhr.send(null);
-                this._template = template;
-                return template;
+                this._template = this.getFromUrlSync({ url: this.$attrs["slideTemplateUrl"] });                
             } else {
-                return this.clone.find("slide")[0].innerHTML;
+                this._template = this.clone.find("slide")[0].innerHTML;
             }
-            
+            return this._template;            
         }
 
         private isAnimating: boolean;
@@ -253,6 +239,7 @@
             "$scope",
             "$timeout",
             "$transclude",
+            "getFromUrlSync",
             "getX",
             "translateX",
             "translateXAsync"

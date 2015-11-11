@@ -74,19 +74,14 @@
     <Content Include="examples\carousel\index.html" />
     <Content Include="examples\listDetail\index.html" />
     <Content Include="examples\rotator\index.html" />
+    <Content Include="examples\rotator\slide.html" />
     <Content Include="examples\vimeo\index.html" />
     <Content Include="examples\youtubeThumbnail\index.html" />
     <Content Include="examples\youtube\home.component.html" />
     <Content Include="examples\youtube\index.html" />
     <Content Include="examples\youtube\video.component.html" />
     <Content Include="node_modules\ng-x\dist\ngX.js" />
-    <Content Include="node_modules\ng-x\dist\ngX.min.js">
-      <DependentUpon>ngX.js</DependentUpon>
-    </Content>
     <Content Include="package.json" />
-    <Content Include="node_modules\ng-x\dist\ngX.min.js.map">
-      <DependentUpon>ngX.min.js</DependentUpon>
-    </Content>
     <Content Include="dist\ngX.components.min.js.map">
       <DependentUpon>ngX.components.min.js</DependentUpon>
     </Content>

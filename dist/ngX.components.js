@@ -150,7 +150,7 @@ var ngX;
          * @module ngX.components
          */
         var Rotator = (function () {
-            function Rotator($attrs, $compile, $element, $http, $interval, $location, $q, $scope, $timeout, $transclude, getX, translateX, translateXAsync) {
+            function Rotator($attrs, $compile, $element, $http, $interval, $location, $q, $scope, $timeout, $transclude, getFromUrlSync, getX, translateX, translateXAsync) {
                 var _this = this;
                 this.$attrs = $attrs;
                 this.$compile = $compile;
@@ -162,6 +162,7 @@ var ngX;
                 this.$scope = $scope;
                 this.$timeout = $timeout;
                 this.$transclude = $transclude;
+                this.getFromUrlSync = getFromUrlSync;
                 this.getX = getX;
                 this.translateX = translateX;
                 this.translateXAsync = translateXAsync;
@@ -293,26 +294,12 @@ var ngX;
                     if (this._template != null)
                         return this._template;
                     if (this.$attrs["slideTemplateUrl"]) {
-                        var template = "";
-                        var xhr = new XMLHttpRequest();
-                        xhr.open("GET", this.$attrs["slideTemplateUrl"], false);
-                        xhr.onload = function (e) {
-                            if (xhr.readyState === 4) {
-                                if (xhr.status === 200) {
-                                    template = xhr.responseText;
-                                }
-                                else {
-                                    console.error(xhr.statusText);
-                                }
-                            }
-                        };
-                        xhr.send(null);
-                        this._template = template;
-                        return template;
+                        this._template = this.getFromUrlSync({ url: this.$attrs["slideTemplateUrl"] });
                     }
                     else {
-                        return this.clone.find("slide")[0].innerHTML;
+                        this._template = this.clone.find("slide")[0].innerHTML;
                     }
+                    return this._template;
                 },
                 enumerable: true,
                 configurable: true
@@ -379,6 +366,7 @@ var ngX;
                 "$scope",
                 "$timeout",
                 "$transclude",
+                "getFromUrlSync",
                 "getX",
                 "translateX",
                 "translateXAsync"
