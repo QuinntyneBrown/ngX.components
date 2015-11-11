@@ -23,11 +23,10 @@
 
         private onInit = () => {
 
-            this.$scope.$on("$locationChangeSuccess", this.onLocationChange);
-
             this.$element.find(".view-port").css("width", this.width);
 
             var fragment = document.createDocumentFragment();
+
             for (var i = 0; i < this.items.length; i++) {
                 var childScope: any = this.$scope.$new(true);
                 childScope[this.$attrs["rotatorForName"] || "rotatorItem"] = this.items[i];
@@ -40,38 +39,30 @@
                 itemContent.addClass("slide");
                 fragment.appendChild(itemContent[0]);
             }
+
+
+
             this.containerNavtiveElement.appendChild(fragment);
 
-            if (this.queryStringParam) {
-                for (var i = 0; i < this.items.length; i++) {
-                    if (this.items[i][this.$attrs["querySearchField"] || 'id'] == this.queryStringParam) {
-                        this.updateCurrentIndex({ currentIndex: i });
-                        var promises = [];
-                        this.isAnimating = true;
-                        this.turnOffTransitions();
-                        for (var h = this.slideNavtiveElements.length - 1; h > -1; h--) {
-                            promises.push(this.translateXAsync({ element: this.slideNavtiveElements[h], x: (this.getX(this.slideNavtiveElements[h]) - (Number(this.width) * (i))) }));
-                        }
+            this.turnOffTransitions();
 
-                        var id = setTimeout(() => {
-                            id = null;
-                            this.isAnimating = false;
-                            this.turnOnTransitions();
-                        }, 0);
-                    }
-                }
-            } else {
-                this.updateCurrentIndex({ currentIndex: 0 });
-            }
+            var desiredX = Number(this.width) * (-1);
+            var delta = desiredX - ((this.items.length - 1) * Number(this.width));
+            this.translateX(this.rendererdNodes[this.items.length - 1].node, delta);
+            this.isAnimating = false;
 
+            setTimeout(() => {
+                this.turnOnTransitions();
+            });
+            
         }
 
-
-        private onLocationChange = () => {
-            if (this.currentIndex != -1 && this.items[this.currentIndex][this.$attrs["querySearchField"] || 'id'] != this.queryStringParam) {
-                this.moveToIndexAsync({ index: this.queryStringParamIndex });
-            }
+        private onLocationChangeSuccess = () => {
+            //if (this.currentIndex != -1 && this.items[this.currentIndex][this.$attrs["querySearchField"] || 'id'] != this.queryStringParam) {
+            //    this.moveToIndexAsync({ index: this.queryStringParamIndex });
+            //}
         }
+
         public get queryStringParam() { return this.$location.search()[this.$attrs["querySearchField"] || 'id']; }
 
         public get queryStringParamIndex() {
@@ -83,17 +74,53 @@
             }
             return value;
         }
+
         public onPreviousAsync = () => {
-            return this.moveToIndexAsync({ index: this.currentIndex - 1 });
+            var index;
+            if (this.currentIndex === 0) {
+                index = this.items.length - 1;
+            } else {
+                index = this.currentIndex - 1;
+            }
+
+            return this.moveToIndexAsync({ index: index }).then(() => {
+                this.turnOffTransitions();
+                var desiredX = Number(this.width) * (-1);
+                var delta = desiredX - this.rendererdNodes[this.items.length - 1].offsetLeft;
+                this.translateX(this.rendererdNodes[this.items.length - 1].node, delta);
+                this.inTransition = true;
+                setTimeout(() => {
+                    this.turnOnTransitions();
+                    this.inTransition = false;
+                }, 300);
+            });
         }
 
         public onNextAsync = () => {
-            return this.moveToIndexAsync({ index: this.currentIndex + 1 });
+
+            var index;
+            if (this.currentIndex === this.items.length - 1) {
+                index = 0;
+            } else {
+                index = this.currentIndex + 1;
+            }
+
+            return this.moveToIndexAsync({ index: index }).then(() => {
+                this.turnOffTransitions();
+                var desiredX = Number(this.width) * (this.items.length - 2);
+                var delta = desiredX - this.rendererdNodes[0].offsetLeft;
+                this.translateX(this.rendererdNodes[0].node, delta);
+                this.inTransition = true;
+                setTimeout(() => {
+                    this.turnOnTransitions();
+                    this.inTransition = false;
+                }, 300);
+            });
         }
 
         public moveToIndexAsync = (options: any) => {
             var deferred = this.$q.defer();                    
-            if (!this.isAnimating) {
+            if (!this.isAnimating && !this.inTransition) {
                 var deltaX = (-1) * (Number(this.width) * (Number(options.index) - Number(this.currentIndex)));
                 var promises = [];
                 this.isAnimating = true;
@@ -135,10 +162,7 @@
         }
 
         public updateCurrentIndex = (options: any) => {
-            this.currentIndex = options.currentIndex;
-            this.$scope.$emit("componentUpdate", { scope: this.$scope });
-            var url = this.items[this.currentIndex][this.$attrs["querySearchField"] || 'id'];
-            this.$location.search(this.$attrs["querySearchField"] || 'id', url);
+
         }
 
         public turnOffTransitions = () => { this.$element.addClass("notransition"); }
@@ -157,15 +181,17 @@
             if (this._template != null)
                 return this._template;
 
-            if (this.$attrs["slideTemplateUrl"]) {
-                this._template = this.getFromUrlSync({ url: this.$attrs["slideTemplateUrl"] });                
+            if (this.$attrs["contentUrl"]) {
+                this._template = this.getFromUrlSync({ url: this.$attrs["contentUrl"] });                
             } else {
-                this._template = this.clone.find("slide")[0].innerHTML;
+                this._template = this.clone.find("content")[0].innerHTML;
             }
             return this._template;            
         }
 
         private isAnimating: boolean;
+
+        private inTransition: boolean;
 
         private get containerNavtiveElement() { return this.$element.find(".container")[0]; }
 
@@ -174,6 +200,27 @@
         private width: string;
 
         private height: string;
+
+        private get rendererdNodes () {
+            var renderedNodes = [];
+
+            for (var i = 0; i < this.slideNavtiveElements.length; i++) {
+                var x = this.getX(this.slideNavtiveElements[i]);
+                var offsetLeft = (<HTMLElement>this.slideNavtiveElements[i]).offsetLeft;
+                var left = x + offsetLeft;
+                var node = this.slideNavtiveElements[i];
+                renderedNodes.push({
+                    x: x,
+                    offsetLeft: offsetLeft,
+                    left: left,
+                    node: node
+                });
+            }
+
+            return renderedNodes.sort((a:any, b:any) => {
+                return a.left - b.left;
+            });
+        }
     }
 
     ngX.Component({
@@ -189,10 +236,10 @@
             "width"
         ],
         styles: [
-            " .rotator .slide { ",
+            " .slide { ",
             "   transition: transform 0.5s cubic-bezier(0.1, 0.1, 0.25, 0.9); } ",
 
-            " .rotator.notransition .slide { ",
+            " .notransition .slide { ",
             "  transition: none !important; } ",
 
             " .rotator .view-port { height:100%; ",
@@ -248,8 +295,8 @@
             "<div class='rotator'> ",
             "<div class='view-port'>",
             "<div class='container'></div>",
-            "<div data-ng-hide='vm.atBegining()' class='previous-arrow' data-ng-click='vm.onPreviousAsync()'>&nbsp;<img src='{{ vm.previousButtonImageUrl }}' /></div>",
-            "<div data-ng-hide='vm.atEnd()' class='next-arrow' data-ng-click='vm.onNextAsync()'>&nbsp;<img src='{{ vm.nextButtonImageUrl }}' /></div>",
+            "<div class='previous-arrow' data-ng-click='vm.onPreviousAsync()'>&nbsp;<img src='{{ vm.previousButtonImageUrl }}' /></div>",
+            "<div class='next-arrow' data-ng-click='vm.onNextAsync()'>&nbsp;<img src='{{ vm.nextButtonImageUrl }}' /></div>",
             "</div>",
             "</div>"
         ].join(" ")

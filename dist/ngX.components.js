@@ -167,7 +167,6 @@ var ngX;
                 this.translateX = translateX;
                 this.translateXAsync = translateXAsync;
                 this.onInit = function () {
-                    _this.$scope.$on("$locationChangeSuccess", _this.onLocationChange);
                     _this.$element.find(".view-port").css("width", _this.width);
                     var fragment = document.createDocumentFragment();
                     for (var i = 0; i < _this.items.length; i++) {
@@ -183,42 +182,63 @@ var ngX;
                         fragment.appendChild(itemContent[0]);
                     }
                     _this.containerNavtiveElement.appendChild(fragment);
-                    if (_this.queryStringParam) {
-                        for (var i = 0; i < _this.items.length; i++) {
-                            if (_this.items[i][_this.$attrs["querySearchField"] || 'id'] == _this.queryStringParam) {
-                                _this.updateCurrentIndex({ currentIndex: i });
-                                var promises = [];
-                                _this.isAnimating = true;
-                                _this.turnOffTransitions();
-                                for (var h = _this.slideNavtiveElements.length - 1; h > -1; h--) {
-                                    promises.push(_this.translateXAsync({ element: _this.slideNavtiveElements[h], x: (_this.getX(_this.slideNavtiveElements[h]) - (Number(_this.width) * (i))) }));
-                                }
-                                var id = setTimeout(function () {
-                                    id = null;
-                                    _this.isAnimating = false;
-                                    _this.turnOnTransitions();
-                                }, 0);
-                            }
-                        }
-                    }
-                    else {
-                        _this.updateCurrentIndex({ currentIndex: 0 });
-                    }
+                    _this.turnOffTransitions();
+                    var desiredX = Number(_this.width) * (-1);
+                    var delta = desiredX - ((_this.items.length - 1) * Number(_this.width));
+                    _this.translateX(_this.rendererdNodes[_this.items.length - 1].node, delta);
+                    _this.isAnimating = false;
+                    setTimeout(function () {
+                        _this.turnOnTransitions();
+                    });
                 };
-                this.onLocationChange = function () {
-                    if (_this.currentIndex != -1 && _this.items[_this.currentIndex][_this.$attrs["querySearchField"] || 'id'] != _this.queryStringParam) {
-                        _this.moveToIndexAsync({ index: _this.queryStringParamIndex });
-                    }
+                this.onLocationChangeSuccess = function () {
+                    //if (this.currentIndex != -1 && this.items[this.currentIndex][this.$attrs["querySearchField"] || 'id'] != this.queryStringParam) {
+                    //    this.moveToIndexAsync({ index: this.queryStringParamIndex });
+                    //}
                 };
                 this.onPreviousAsync = function () {
-                    return _this.moveToIndexAsync({ index: _this.currentIndex - 1 });
+                    var index;
+                    if (_this.currentIndex === 0) {
+                        index = _this.items.length - 1;
+                    }
+                    else {
+                        index = _this.currentIndex - 1;
+                    }
+                    return _this.moveToIndexAsync({ index: index }).then(function () {
+                        _this.turnOffTransitions();
+                        var desiredX = Number(_this.width) * (-1);
+                        var delta = desiredX - _this.rendererdNodes[_this.items.length - 1].offsetLeft;
+                        _this.translateX(_this.rendererdNodes[_this.items.length - 1].node, delta);
+                        _this.inTransition = true;
+                        setTimeout(function () {
+                            _this.turnOnTransitions();
+                            _this.inTransition = false;
+                        }, 300);
+                    });
                 };
                 this.onNextAsync = function () {
-                    return _this.moveToIndexAsync({ index: _this.currentIndex + 1 });
+                    var index;
+                    if (_this.currentIndex === _this.items.length - 1) {
+                        index = 0;
+                    }
+                    else {
+                        index = _this.currentIndex + 1;
+                    }
+                    return _this.moveToIndexAsync({ index: index }).then(function () {
+                        _this.turnOffTransitions();
+                        var desiredX = Number(_this.width) * (_this.items.length - 2);
+                        var delta = desiredX - _this.rendererdNodes[0].offsetLeft;
+                        _this.translateX(_this.rendererdNodes[0].node, delta);
+                        _this.inTransition = true;
+                        setTimeout(function () {
+                            _this.turnOnTransitions();
+                            _this.inTransition = false;
+                        }, 300);
+                    });
                 };
                 this.moveToIndexAsync = function (options) {
                     var deferred = _this.$q.defer();
-                    if (!_this.isAnimating) {
+                    if (!_this.isAnimating && !_this.inTransition) {
                         var deltaX = (-1) * (Number(_this.width) * (Number(options.index) - Number(_this.currentIndex)));
                         var promises = [];
                         _this.isAnimating = true;
@@ -254,10 +274,6 @@ var ngX;
                     delete _this.clone;
                 };
                 this.updateCurrentIndex = function (options) {
-                    _this.currentIndex = options.currentIndex;
-                    _this.$scope.$emit("componentUpdate", { scope: _this.$scope });
-                    var url = _this.items[_this.currentIndex][_this.$attrs["querySearchField"] || 'id'];
-                    _this.$location.search(_this.$attrs["querySearchField"] || 'id', url);
                 };
                 this.turnOffTransitions = function () { _this.$element.addClass("notransition"); };
                 this.currentIndex = -1;
@@ -293,11 +309,11 @@ var ngX;
                 get: function () {
                     if (this._template != null)
                         return this._template;
-                    if (this.$attrs["slideTemplateUrl"]) {
-                        this._template = this.getFromUrlSync({ url: this.$attrs["slideTemplateUrl"] });
+                    if (this.$attrs["contentUrl"]) {
+                        this._template = this.getFromUrlSync({ url: this.$attrs["contentUrl"] });
                     }
                     else {
-                        this._template = this.clone.find("slide")[0].innerHTML;
+                        this._template = this.clone.find("content")[0].innerHTML;
                     }
                     return this._template;
                 },
@@ -306,6 +322,28 @@ var ngX;
             });
             Object.defineProperty(Rotator.prototype, "containerNavtiveElement", {
                 get: function () { return this.$element.find(".container")[0]; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Rotator.prototype, "rendererdNodes", {
+                get: function () {
+                    var renderedNodes = [];
+                    for (var i = 0; i < this.slideNavtiveElements.length; i++) {
+                        var x = this.getX(this.slideNavtiveElements[i]);
+                        var offsetLeft = this.slideNavtiveElements[i].offsetLeft;
+                        var left = x + offsetLeft;
+                        var node = this.slideNavtiveElements[i];
+                        renderedNodes.push({
+                            x: x,
+                            offsetLeft: offsetLeft,
+                            left: left,
+                            node: node
+                        });
+                    }
+                    return renderedNodes.sort(function (a, b) {
+                        return a.left - b.left;
+                    });
+                },
                 enumerable: true,
                 configurable: true
             });
@@ -325,9 +363,9 @@ var ngX;
                 "width"
             ],
             styles: [
-                " .rotator .slide { ",
+                " .slide { ",
                 "   transition: transform 0.5s cubic-bezier(0.1, 0.1, 0.25, 0.9); } ",
-                " .rotator.notransition .slide { ",
+                " .notransition .slide { ",
                 "  transition: none !important; } ",
                 " .rotator .view-port { height:100%; ",
                 "   position: relative; ",
@@ -375,8 +413,8 @@ var ngX;
                 "<div class='rotator'> ",
                 "<div class='view-port'>",
                 "<div class='container'></div>",
-                "<div data-ng-hide='vm.atBegining()' class='previous-arrow' data-ng-click='vm.onPreviousAsync()'>&nbsp;<img src='{{ vm.previousButtonImageUrl }}' /></div>",
-                "<div data-ng-hide='vm.atEnd()' class='next-arrow' data-ng-click='vm.onNextAsync()'>&nbsp;<img src='{{ vm.nextButtonImageUrl }}' /></div>",
+                "<div class='previous-arrow' data-ng-click='vm.onPreviousAsync()'>&nbsp;<img src='{{ vm.previousButtonImageUrl }}' /></div>",
+                "<div class='next-arrow' data-ng-click='vm.onNextAsync()'>&nbsp;<img src='{{ vm.nextButtonImageUrl }}' /></div>",
                 "</div>",
                 "</div>"
             ].join(" ")
@@ -385,6 +423,54 @@ var ngX;
 })(ngX || (ngX = {}));
 
 //# sourceMappingURL=rotator.js.map
+
+var ngX;
+(function (ngX) {
+    var components;
+    (function (components) {
+        ngX.Component({
+            module: "ngX.components",
+            selector: "social-media-meta-tag",
+            template: [
+                "<!-- Update your html tag to include the itemscope and itemtype attributes. --> ",
+                "<html itemscope itemtype='http://schema.org/Article'> ",
+                " ",
+                "<!-- Place this data between the <head> tags of your website --> ",
+                "<title>Page Title. Maximum length 60-70 characters</title> ",
+                "<meta name='description' content='Page description. No longer than 155 characters.' /> ",
+                " ",
+                "<!-- Schema.org markup for Google+ --> ",
+                "<meta itemprop='name' content='The Name or Title Here'> ",
+                "<meta itemprop='description' content='This is the page description'> ",
+                "<meta itemprop='image' content='http://www.example.com/image.jpg'> ",
+                " ",
+                "<!-- Twitter Card data --> ",
+                "<meta name='twitter:card' content='summary_large_image'> ",
+                "<meta name='twitter:site' content='@publisher_handle'> ",
+                "<meta name='twitter:title' content='Page Title'> ",
+                "<meta name='twitter:description' content='Page description less than 200 characters'> ",
+                "<meta name='twitter:creator' content='@author_handle'> ",
+                "<!-- Twitter summary card with large image must be at least 280x150px --> ",
+                "<meta name='twitter:image:src' content='http://www.example.com/image.html'> ",
+                " ",
+                "<!-- Open Graph data --> ",
+                "<meta property='og:title' content='Title Here' /> ",
+                "<meta property='og:type' content='article' /> ",
+                "<meta property='og:url' content='http://www.example.com/' /> ",
+                "<meta property='og:image' content='http://example.com/image.jpg' /> ",
+                "<meta property='og:description' content='Description Here' /> ",
+                "<meta property='og:site_name' content='Site Name, i.e. Moz' /> ",
+                "<meta property='article:published_time' content='2013-09-17T05:59:00+01:00' /> ",
+                "<meta property='article:modified_time' content='2013-09-16T19:08:47+01:00' /> ",
+                "<meta property='article:section' content='Article Section' /> ",
+                "<meta property='article:tag' content='Article Tag' /> ",
+                "<meta property='fb:admins' content='Facebook numberic ID' /> "
+            ].join(" ")
+        });
+    })(components = ngX.components || (ngX.components = {}));
+})(ngX || (ngX = {}));
+
+//# sourceMappingURL=socialMediaMetaTag.js.map
 
 
 
