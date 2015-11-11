@@ -204,7 +204,7 @@ var ngX;
                         var delta = desiredX - _this.rendererdNodes[_this.items.length - 1].offsetLeft;
                         _this.translateX(_this.rendererdNodes[_this.items.length - 1].node, delta);
                         _this.inTransition = true;
-                        _this.currentIndex = (_this.currentIndex === 0) ? _this.items.length : _this.currentIndex - 1;
+                        _this.currentIndex = (_this.currentIndex === 0) ? _this.items.length - 1 : _this.currentIndex - 1;
                         setTimeout(function () {
                             _this.turnOnTransitions();
                             _this.inTransition = false;

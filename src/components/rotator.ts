@@ -1,4 +1,4 @@
-﻿﻿﻿module ngX.components {
+﻿﻿﻿﻿module ngX.components {
     
     /**
      * @name Rotator
@@ -76,14 +76,14 @@
             return value;
         }
 
-        public onPreviousAsync = () => {            
+        public onPreviousAsync = () => {
             return this.move({ x: (Number(this.width)) }).then(() => {
                 this.turnOffTransitions();
                 var desiredX = Number(this.width) * (-1);
                 var delta = desiredX - this.rendererdNodes[this.items.length - 1].offsetLeft;
                 this.translateX(this.rendererdNodes[this.items.length - 1].node, delta);
                 this.inTransition = true;
-                this.currentIndex = (this.currentIndex === 0) ? this.items.length : this.currentIndex - 1;
+                this.currentIndex = (this.currentIndex === 0) ? this.items.length - 1: this.currentIndex - 1;
                 setTimeout(() => {
                     this.turnOnTransitions();
                     this.inTransition = false;
