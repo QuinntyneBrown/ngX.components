@@ -21,17 +21,29 @@
                      previous-button-image-url="'../../assets/images/rotator_button_prev.png'"
                      query-search-field="title"
                      width="'1200'"
+                     height='800'
+                     slide-template-url="slide.html">
+            </rotator>
+        </div>
+       
+    </div>
+    
+    <div style="overflow-x: hidden; overflow-y: hidden; height: 800px; width: 100%;">
+        <div style="width:1200px; height: 800px; margin: 0 auto;">
+            <rotator id="featured"
+                     items="vm.photos"
+                     rotator-for-name="photo"
+                     next-button-image-url="'../../assets/images/rotator_button_next.png'"
+                     previous-button-image-url="'../../assets/images/rotator_button_prev.png'"
+                     query-search-field="title"
+                     width="'1200'"
                      height='800'>
-
                 <slide>
                     <img src="{{ photo.imageUrl }}" height="800" width="1200" />
                 </slide>
-
             </rotator>
         </div>
-
     </div>
-
     <script src="../../node_modules/jquery/dist/jquery.js"></script>
     <script src="../../node_modules/angular/angular.js"></script>
     <script src="../../node_modules/angular-route/angular-route.js"></script>

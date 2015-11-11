@@ -166,11 +166,7 @@ var ngX;
                 this.translateX = translateX;
                 this.translateXAsync = translateXAsync;
                 this.onInit = function () {
-                    _this.$scope.$on("$locationChangeSuccess", function () {
-                        if (_this.currentIndex != -1 && _this.items[_this.currentIndex][_this.$attrs["querySearchField"] || 'id'] != _this.queryStringParam) {
-                            _this.moveToIndexAsync({ index: _this.queryStringParamIndex });
-                        }
-                    });
+                    _this.$scope.$on("$locationChangeSuccess", _this.onLocationChange);
                     _this.$element.find(".view-port").css("width", _this.width);
                     var fragment = document.createDocumentFragment();
                     for (var i = 0; i < _this.items.length; i++) {
@@ -208,64 +204,32 @@ var ngX;
                         _this.updateCurrentIndex({ currentIndex: 0 });
                     }
                 };
+                this.onLocationChange = function () {
+                    if (_this.currentIndex != -1 && _this.items[_this.currentIndex][_this.$attrs["querySearchField"] || 'id'] != _this.queryStringParam) {
+                        _this.moveToIndexAsync({ index: _this.queryStringParamIndex });
+                    }
+                };
                 this.onPreviousAsync = function () {
-                    var deferred = _this.$q.defer();
-                    if (!_this.isAnimating && _this.currentIndex != 0) {
-                        var promises = [];
-                        _this.isAnimating = true;
-                        for (var i = 0; i < _this.slideNavtiveElements.length; i++) {
-                            promises.push(_this.translateXAsync({ element: _this.slideNavtiveElements[i], x: (_this.getX(_this.slideNavtiveElements[i]) + Number(_this.width)) }));
-                        }
-                        _this.$q.all(promises).then(function () {
-                            /**
-                             * move tail to head
-                             */
-                            _this.updateCurrentIndex({ currentIndex: _this.currentIndex - 1 });
-                            _this.isAnimating = false;
-                            deferred.resolve();
-                        });
-                    }
-                    else {
-                        deferred.reject();
-                    }
-                    return deferred.promise;
+                    return _this.moveToIndexAsync({ index: _this.currentIndex - 1 });
                 };
                 this.onNextAsync = function () {
-                    var deferred = _this.$q.defer();
-                    if (!_this.isAnimating && _this.currentIndex != _this.items.length - 1) {
-                        var promises = [];
-                        _this.isAnimating = true;
-                        for (var i = _this.slideNavtiveElements.length - 1; i > -1; i--) {
-                            promises.push(_this.translateXAsync({ element: _this.slideNavtiveElements[i], x: (_this.getX(_this.slideNavtiveElements[i]) - Number(_this.width)) }));
-                        }
-                        _this.$q.all(promises).then(function () {
-                            /**
-                             * move the head to tail
-                             */
-                            _this.updateCurrentIndex({ currentIndex: _this.currentIndex + 1 });
-                            _this.isAnimating = false;
-                            deferred.resolve();
-                        });
-                    }
-                    else {
-                        deferred.reject();
-                    }
-                    return deferred.promise;
+                    return _this.moveToIndexAsync({ index: _this.currentIndex + 1 });
                 };
                 this.moveToIndexAsync = function (options) {
                     var deferred = _this.$q.defer();
-                    var move = 0;
-                    if (Number(_this.currentIndex) > Number(options.index)) {
-                        move = (-1) * (Number(_this.width) * (Number(options.index) - Number(_this.currentIndex)));
-                    }
-                    else {
-                        move = (-1) * Number(_this.width) * (Number(options.index) - Number(_this.currentIndex));
-                    }
                     if (!_this.isAnimating) {
+                        var deltaX = (-1) * (Number(_this.width) * (Number(options.index) - Number(_this.currentIndex)));
                         var promises = [];
                         _this.isAnimating = true;
-                        for (var i = _this.slideNavtiveElements.length - 1; i > -1; i--) {
-                            promises.push(_this.translateXAsync({ element: _this.slideNavtiveElements[i], x: (_this.getX(_this.slideNavtiveElements[i]) + move) }));
+                        if (deltaX < 0) {
+                            for (var i = _this.slideNavtiveElements.length - 1; i > -1; i--) {
+                                promises.push(_this.translateXAsync({ element: _this.slideNavtiveElements[i], x: (_this.getX(_this.slideNavtiveElements[i]) + deltaX) }));
+                            }
+                        }
+                        if (deltaX >= 0) {
+                            for (var i = 0; i < _this.slideNavtiveElements.length; i++) {
+                                promises.push(_this.translateXAsync({ element: _this.slideNavtiveElements[i], x: (_this.getX(_this.slideNavtiveElements[i]) + deltaX) }));
+                            }
                         }
                         _this.$q.all(promises).then(function () {
                             _this.updateCurrentIndex({ currentIndex: options.index });
@@ -296,6 +260,7 @@ var ngX;
                 };
                 this.turnOffTransitions = function () { _this.$element.addClass("notransition"); };
                 this.currentIndex = -1;
+                this._template = null;
             }
             Object.defineProperty(Rotator.prototype, "queryStringParam", {
                 get: function () { return this.$location.search()[this.$attrs["querySearchField"] || 'id']; },
@@ -324,7 +289,31 @@ var ngX;
                 configurable: true
             });
             Object.defineProperty(Rotator.prototype, "template", {
-                get: function () { return this.clone.find("slide")[0].innerHTML; },
+                get: function () {
+                    if (this._template != null)
+                        return this._template;
+                    if (this.$attrs["slideTemplateUrl"]) {
+                        var template = "";
+                        var xhr = new XMLHttpRequest();
+                        xhr.open("GET", this.$attrs["slideTemplateUrl"], false);
+                        xhr.onload = function (e) {
+                            if (xhr.readyState === 4) {
+                                if (xhr.status === 200) {
+                                    template = xhr.responseText;
+                                }
+                                else {
+                                    console.error(xhr.statusText);
+                                }
+                            }
+                        };
+                        xhr.send(null);
+                        this._template = template;
+                        return template;
+                    }
+                    else {
+                        return this.clone.find("slide")[0].innerHTML;
+                    }
+                },
                 enumerable: true,
                 configurable: true
             });

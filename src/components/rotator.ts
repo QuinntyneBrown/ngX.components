@@ -22,11 +22,7 @@
 
         private onInit = () => {
 
-            this.$scope.$on("$locationChangeSuccess", () => {
-                if (this.currentIndex != -1 && this.items[this.currentIndex][this.$attrs["querySearchField"] || 'id'] != this.queryStringParam) {
-                    this.moveToIndexAsync({ index: this.queryStringParamIndex });
-                }
-            });
+            this.$scope.$on("$locationChangeSuccess", this.onLocationChange);
 
             this.$element.find(".view-port").css("width", this.width);
 
@@ -69,6 +65,12 @@
 
         }
 
+
+        private onLocationChange = () => {
+            if (this.currentIndex != -1 && this.items[this.currentIndex][this.$attrs["querySearchField"] || 'id'] != this.queryStringParam) {
+                this.moveToIndexAsync({ index: this.queryStringParamIndex });
+            }
+        }
         public get queryStringParam() { return this.$location.search()[this.$attrs["querySearchField"] || 'id']; }
 
         public get queryStringParamIndex() {
@@ -78,67 +80,32 @@
                     value = i;
                 }
             }
-
             return value;
         }
         public onPreviousAsync = () => {
-            var deferred = this.$q.defer();
-            if (!this.isAnimating && this.currentIndex != 0) {
-                var promises = [];
-                this.isAnimating = true;
-                for (var i = 0; i < this.slideNavtiveElements.length; i++) {
-                    promises.push(this.translateXAsync({ element: this.slideNavtiveElements[i], x: (this.getX(this.slideNavtiveElements[i]) + Number(this.width)) }));
-                }
-                this.$q.all(promises).then(() => {
-                    /**
-                     * move tail to head
-                     */
-                    this.updateCurrentIndex({ currentIndex: this.currentIndex - 1 });
-                    this.isAnimating = false;
-                    deferred.resolve();
-                });
-            } else {
-                deferred.reject();
-            }
-            return deferred.promise;
+            return this.moveToIndexAsync({ index: this.currentIndex - 1 });
         }
 
         public onNextAsync = () => {
-            var deferred = this.$q.defer();
-            if (!this.isAnimating && this.currentIndex != this.items.length - 1) {
-                var promises = [];
-                this.isAnimating = true;
-                for (var i = this.slideNavtiveElements.length - 1; i > -1; i--) {
-                    promises.push(this.translateXAsync({ element: this.slideNavtiveElements[i], x: (this.getX(this.slideNavtiveElements[i]) - Number(this.width)) }));
-                }
-                this.$q.all(promises).then(() => {
-                    /**
-                     * move the head to tail
-                     */
-                    this.updateCurrentIndex({ currentIndex: this.currentIndex + 1 });
-                    this.isAnimating = false;
-                    deferred.resolve();
-                });
-            } else {
-                deferred.reject();
-            }
-            return deferred.promise;
+            return this.moveToIndexAsync({ index: this.currentIndex + 1 });
         }
 
         public moveToIndexAsync = (options: any) => {
-            var deferred = this.$q.defer();
-            var move = 0;
-            if (Number(this.currentIndex) > Number(options.index)) {
-                move = (-1) * (Number(this.width) * (Number(options.index) - Number(this.currentIndex)));
-            } else {
-                move = (-1) * Number(this.width) * (Number(options.index) - Number(this.currentIndex));    
-            }
-
+            var deferred = this.$q.defer();                    
             if (!this.isAnimating) {
+                var deltaX = (-1) * (Number(this.width) * (Number(options.index) - Number(this.currentIndex)));
                 var promises = [];
                 this.isAnimating = true;
-                for (var i = this.slideNavtiveElements.length - 1; i > -1; i--) {
-                    promises.push(this.translateXAsync({ element: this.slideNavtiveElements[i], x: (this.getX(this.slideNavtiveElements[i]) + move) }));
+
+                if (deltaX < 0) {
+                    for (var i = this.slideNavtiveElements.length - 1; i > -1; i--) {
+                        promises.push(this.translateXAsync({ element: this.slideNavtiveElements[i], x: (this.getX(this.slideNavtiveElements[i]) + deltaX) }));
+                    }
+                }
+                if (deltaX >= 0) {
+                    for (var i = 0; i < this.slideNavtiveElements.length; i++) {
+                        promises.push(this.translateXAsync({ element: this.slideNavtiveElements[i], x: (this.getX(this.slideNavtiveElements[i]) + deltaX) }));
+                    }
                 }
                 this.$q.all(promises).then(() => {
                     this.updateCurrentIndex({ currentIndex: options.index });
@@ -183,7 +150,34 @@
 
         private currentIndex: number = -1;
 
-        private get template() { return this.clone.find("slide")[0].innerHTML; }
+        private _template: string = null;
+
+        private get template() {
+
+            if (this._template != null)
+                return this._template;
+
+            if (this.$attrs["slideTemplateUrl"]) {
+                var template = "";
+                var xhr = new XMLHttpRequest();
+                xhr.open("GET", this.$attrs["slideTemplateUrl"], false);
+                xhr.onload = function (e) {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            template = xhr.responseText;
+                        } else {
+                            console.error(xhr.statusText);
+                        }
+                    }
+                };
+                xhr.send(null);
+                this._template = template;
+                return template;
+            } else {
+                return this.clone.find("slide")[0].innerHTML;
+            }
+            
+        }
 
         private isAnimating: boolean;
 
