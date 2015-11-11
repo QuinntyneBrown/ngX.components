@@ -1,4 +1,4 @@
-﻿module ngX.components {
+﻿﻿module ngX.components {
     
     /**
      * @name Rotator
@@ -11,7 +11,7 @@
             private $element: ng.IAugmentedJQuery,
             private $http: ng.IHttpService,
             private $interval: ng.IIntervalService,
-            private $location:ng.ILocationService,
+            private $location: ng.ILocationService,
             private $q: ng.IQService,
             private $scope: ng.IScope,
             private $timeout: ng.ITimeoutService,
@@ -21,7 +21,7 @@
             private translateXAsync: Function) { }
 
         private onInit = () => {
-            
+
             this.$element.find(".view-port").css("width", this.width);
 
             var fragment = document.createDocumentFragment();
@@ -38,6 +38,28 @@
                 fragment.appendChild(itemContent[0]);
             }
             this.containerNavtiveElement.appendChild(fragment);
+
+            var queryStringValue = this.$location.search()[this.$attrs["querySearchField"] || 'id'];
+
+            if (queryStringValue) {
+                for (var i = 0; i < this.items.length; i++) {
+                    if (this.items[i][this.$attrs["querySearchField"] || 'id'] == queryStringValue) {
+                        this.updateCurrentIndex({ currentIndex: i });
+                        var promises = [];
+                        this.isAnimating = true;
+                        for (var h = this.slideNavtiveElements.length - 1; h > -1; h--) {
+                            promises.push(this.translateXAsync({ element: this.slideNavtiveElements[h], x: (this.getX(this.slideNavtiveElements[h]) - (Number(this.width) * (i))) }));
+                        }
+
+                        this.$q.all(promises).then(() => {                            
+                            this.isAnimating = false;                            
+                        });
+                    }
+                }
+            } else {
+                this.updateCurrentIndex({ currentIndex: 0 });
+            }
+
         }
 
         public onPreviousAsync = () => {
@@ -52,7 +74,7 @@
                     /**
                      * move tail to head
                      */
-                    this.updateCurrentIndex({ currentIndex: this.currentIndex -1 });
+                    this.updateCurrentIndex({ currentIndex: this.currentIndex - 1 });
                     this.isAnimating = false;
                     deferred.resolve();
                 });
@@ -67,7 +89,7 @@
             if (!this.isAnimating) {
                 var promises = [];
                 this.isAnimating = true;
-                for (var i = this.slideNavtiveElements.length -1; i > -1; i--) {
+                for (var i = this.slideNavtiveElements.length - 1; i > -1; i--) {
                     promises.push(this.translateXAsync({ element: this.slideNavtiveElements[i], x: (this.getX(this.slideNavtiveElements[i]) - Number(this.width)) }));
                 }
                 this.$q.all(promises).then(() => {
@@ -98,8 +120,8 @@
         public updateCurrentIndex = (options: any) => {
             this.currentIndex = options.currentIndex;
             this.$scope.$emit("rotatorUpdate", { scope: this.$scope });
-            var url = (<any>angular.element(this.slideNavtiveElements[this.currentIndex]).scope())[this.$attrs["rotatorForName"] || "rotatorItem"][this.$attrs["querySearchField"] || 'guid'];
-            this.$location.search(this.$attrs["querySearchField"] || 'guid', url);
+            var url = this.items[this.currentIndex][this.$attrs["querySearchField"] || 'id'];
+            this.$location.search(this.$attrs["querySearchField"] || 'id', url);
         }
 
         public turnOffTransitions = () => { this.$element.addClass("notransition"); }
@@ -110,32 +132,32 @@
 
         private clone: any;
 
-        private currentIndex:number = 0;
+        private currentIndex: number = 0;
 
         private get template() { return this.clone.find("slide")[0].innerHTML; }
 
-        private isAnimating:boolean;
+        private isAnimating: boolean;
 
-        private get containerNavtiveElement() { return this.$element.find(".container")[0]; } 
+        private get containerNavtiveElement() { return this.$element.find(".container")[0]; }
 
         private items: any;
 
         private width: string;
 
-        private height:string;
+        private height: string;
     }
 
     ngX.Component({
-        module:"ngX.components",
+        module: "ngX.components",
         selector: "rotator",
         component: Rotator,
-        transclude:"element",
+        transclude: "element",
         inputs: [
             "height",
             "items",
             "nextButtonImageUrl",
             "previousButtonImageUrl",
-            "width"           
+            "width"
         ],
         styles: [
             " .rotator .slide { ",

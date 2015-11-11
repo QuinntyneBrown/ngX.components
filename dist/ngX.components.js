@@ -181,6 +181,25 @@ var ngX;
                         fragment.appendChild(itemContent[0]);
                     }
                     _this.containerNavtiveElement.appendChild(fragment);
+                    var queryStringValue = _this.$location.search()[_this.$attrs["querySearchField"] || 'id'];
+                    if (queryStringValue) {
+                        for (var i = 0; i < _this.items.length; i++) {
+                            if (_this.items[i][_this.$attrs["querySearchField"] || 'id'] == queryStringValue) {
+                                _this.updateCurrentIndex({ currentIndex: i });
+                                var promises = [];
+                                _this.isAnimating = true;
+                                for (var h = _this.slideNavtiveElements.length - 1; h > -1; h--) {
+                                    promises.push(_this.translateXAsync({ element: _this.slideNavtiveElements[h], x: (_this.getX(_this.slideNavtiveElements[h]) - (Number(_this.width) * (i))) }));
+                                }
+                                _this.$q.all(promises).then(function () {
+                                    _this.isAnimating = false;
+                                });
+                            }
+                        }
+                    }
+                    else {
+                        _this.updateCurrentIndex({ currentIndex: 0 });
+                    }
                 };
                 this.onPreviousAsync = function () {
                     var deferred = _this.$q.defer();
@@ -239,8 +258,8 @@ var ngX;
                 this.updateCurrentIndex = function (options) {
                     _this.currentIndex = options.currentIndex;
                     _this.$scope.$emit("rotatorUpdate", { scope: _this.$scope });
-                    var url = angular.element(_this.slideNavtiveElements[_this.currentIndex]).scope()[_this.$attrs["rotatorForName"] || "rotatorItem"][_this.$attrs["querySearchField"] || 'guid'];
-                    _this.$location.search(_this.$attrs["querySearchField"] || 'guid', url);
+                    var url = _this.items[_this.currentIndex][_this.$attrs["querySearchField"] || 'id'];
+                    _this.$location.search(_this.$attrs["querySearchField"] || 'id', url);
                 };
                 this.turnOffTransitions = function () { _this.$element.addClass("notransition"); };
                 this.currentIndex = 0;

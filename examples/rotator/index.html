@@ -2,26 +2,32 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title>Rotator</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+    </style>
 </head>
 <body data-ng-app="ngX.components" data-ng-controller="pageController as vm">
 
-    <div>
-        
+    <div style="overflow-x: hidden; overflow-y: hidden;">
+
         <rotator id="featured"
                  items="vm.photos"
                  rotator-for-name="photo"
                  next-button-image-url="'../../assets/images/rotator_button_next.png'"
                  previous-button-image-url="'../../assets/images/rotator_button_prev.png'"
-                 query-search-field="imageUrl"
+                 query-search-field="title"
                  width="'1200'"
-                 height="'800'">
+                 height='800'>
 
             <slide>
                 <img src="{{ photo.imageUrl }}" />
             </slide>
 
         </rotator>
-        
+
     </div>
 
     <script src="../../node_modules/jquery/dist/jquery.js"></script>
@@ -33,20 +39,21 @@
     <script>
         function pageController($scope) {
 
-            $scope.$on("rotatorUpdate", function(event,obj) {
-                console.log(obj.scope.vm.$attrs["id"] + " : " + obj.scope.vm.currentIndex);
+            $scope.$on("componentUpdate", function (event, obj) {
+                console.log(obj.scope.vm.$attrs["title"] + " : " + obj.scope.vm.currentIndex);
             });
+
             var self = this;
 
             
             self.photos = [
-                { imageUrl: "../../assets/images/photo1.jpg" },
-                { imageUrl: "../../assets/images/photo2.jpg" },
-                { imageUrl: "../../assets/images/photo3.jpg" },
-                { imageUrl: "../../assets/images/photo4.jpg" },
-                { imageUrl: "../../assets/images/photo5.jpg" },
-                { imageUrl: "../../assets/images/photo6.jpg" },
-                { imageUrl: "../../assets/images/photo7.jpg" }
+                { imageUrl: "../../assets/images/photo1.jpg", title:"snacks" },
+                { imageUrl: "../../assets/images/photo2.jpg", title:"jae_and_mom" },
+                { imageUrl: "../../assets/images/photo3.jpg", title:"gifts" },
+                { imageUrl: "../../assets/images/photo4.jpg", title:"QB_da_boss" },
+                { imageUrl: "../../assets/images/photo5.jpg", title:"reading" },
+                { imageUrl: "../../assets/images/photo6.jpg", title:"cake_cake" },
+                { imageUrl: "../../assets/images/photo7.jpg", title:"laughing" }
             ];
 
             return self;
