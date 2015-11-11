@@ -12,8 +12,8 @@
                     callback: 'JSON_CALLBACK',
                     player_id: "1"
                 }
-            }).then((res: any) => {
-                this.$element.html(res.data.html);
+            }).then((response: any) => {
+                this.$element.html(response.data.html);
             });
         }
 

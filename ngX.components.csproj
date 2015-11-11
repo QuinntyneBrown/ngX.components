@@ -71,6 +71,7 @@
     <Content Include="examples\listDetail\index.html" />
     <Content Include="examples\rotator\index.html" />
     <Content Include="examples\vimeo\index.html" />
+    <Content Include="examples\youtubeThumbnail\index.html" />
     <Content Include="examples\youtube\home.component.html" />
     <Content Include="examples\youtube\index.html" />
     <Content Include="examples\youtube\video.component.html" />

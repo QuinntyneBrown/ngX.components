@@ -376,8 +376,8 @@ var ngX;
                             callback: 'JSON_CALLBACK',
                             player_id: "1"
                         }
-                    }).then(function (res) {
-                        _this.$element.html(res.data.html);
+                    }).then(function (response) {
+                        _this.$element.html(response.data.html);
                     });
                 };
                 this.dispose = function () {
@@ -526,6 +526,9 @@ var ngX;
             styles: [".youtube { }"].join(" /n "),
             template: ["<div class='youtube'></div>"].join(" ")
         });
+        angular.module("ngX.components").filter("youtubeThumbnail", [function () {
+                return function (videoId) { return "http://img.youtube.com/vi/" + videoId + "/0.jpg"; };
+            }]);
     })(components = ngX.components || (ngX.components = {}));
 })(ngX || (ngX = {}));
 

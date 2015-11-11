@@ -98,4 +98,8 @@
          styles: [".youtube { }"].join(" /n "),
          template: ["<div class='youtube'></div>"].join(" ")
      });
+
+     angular.module("ngX.components").filter("youtubeThumbnail", [() => {
+         return (videoId) => { return "http://img.youtube.com/vi/" + videoId + "/0.jpg"; };
+     }]);
  }
