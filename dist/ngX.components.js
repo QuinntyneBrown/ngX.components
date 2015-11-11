@@ -188,12 +188,15 @@ var ngX;
                                 _this.updateCurrentIndex({ currentIndex: i });
                                 var promises = [];
                                 _this.isAnimating = true;
+                                _this.turnOffTransitions();
                                 for (var h = _this.slideNavtiveElements.length - 1; h > -1; h--) {
                                     promises.push(_this.translateXAsync({ element: _this.slideNavtiveElements[h], x: (_this.getX(_this.slideNavtiveElements[h]) - (Number(_this.width) * (i))) }));
                                 }
-                                _this.$q.all(promises).then(function () {
+                                var id = setTimeout(function () {
+                                    id = null;
                                     _this.isAnimating = false;
-                                });
+                                    _this.turnOnTransitions();
+                                }, 0);
                             }
                         }
                     }
@@ -300,11 +303,13 @@ var ngX;
                 "   transition: transform 0.5s cubic-bezier(0.1, 0.1, 0.25, 0.9); } ",
                 " .rotator.notransition .slide { ",
                 "  transition: none !important; } ",
-                " .rotator .view-port { ",
+                " .rotator .view-port { height:100%; ",
                 "   position: relative; ",
                 "   overflow-x: hidden; ",
                 "   overflow-y: hidden; ",
                 " } ",
+                " .rotator .view-port .previous-arrow, .rotator .view-port .next-arrow { ",
+                "  height:100%; width:80px; } ",
                 " .rotator .view-port .previous-arrow img, ",
                 " .rotator .view-port .next-arrow img { ",
                 "   position: absolute; ",
@@ -312,15 +317,15 @@ var ngX;
                 "   cursor: pointer; ",
                 "   left: 0; ",
                 "   z-index: 999; ",
-                "   opacity: .4; ",
-                "   transition: opacity .500s; } ",
+                "   opacity: .3; ",
+                "   transition: all .250s; } ",
                 " .rotator .view-port .next-arrow img { ",
                 "   left: calc(100% - 80px); } ",
                 " .rotator .view-port .container { ",
                 "   width: 99999px; } ",
                 " .rotator .view-port .previous-arrow img:hover, ",
                 " .rotator .view-port .next-arrow img:hover { ",
-                "   opacity: .7; } ",
+                "   opacity: .9; transform: scale(1.5,1.5); } ",
                 " .rotator .view-port .slide { ",
                 "   position: relative; ",
                 "   float: left; ",
@@ -345,8 +350,8 @@ var ngX;
                 "<div class='rotator'> ",
                 "<div class='view-port'>",
                 "<div class='container'></div>",
-                "<div class='previous-arrow' data-ng-click='vm.onPreviousAsync()'><img src='{{ vm.previousButtonImageUrl }}' /></div>",
-                "<div class='next-arrow' data-ng-click='vm.onNextAsync()'><img src='{{ vm.nextButtonImageUrl }}' /></div>",
+                "<div class='previous-arrow' data-ng-click='vm.onPreviousAsync()'>&nbsp;<img src='{{ vm.previousButtonImageUrl }}' /></div>",
+                "<div class='next-arrow' data-ng-click='vm.onNextAsync()'>&nbsp;<img src='{{ vm.nextButtonImageUrl }}' /></div>",
                 "</div>",
                 "</div>"
             ].join(" ")
