@@ -70,6 +70,7 @@
     <Content Include="assets\images\photo7.jpg" />
     <Content Include="examples\listDetail\index.html" />
     <Content Include="examples\rotator\index.html" />
+    <Content Include="examples\vimeo\index.html" />
     <Content Include="examples\youtube\home.component.html" />
     <Content Include="examples\youtube\index.html" />
     <Content Include="examples\youtube\video.component.html" />
@@ -110,6 +111,7 @@
     <TypeScriptCompile Include="src\components\loginForm.ts" />
     <TypeScriptCompile Include="src\components\rotator.ts" />
     <TypeScriptCompile Include="src\components\tabs.ts" />
+    <TypeScriptCompile Include="src\components\vimeo.ts" />
     <TypeScriptCompile Include="src\components\virtualFor.ts" />
     <TypeScriptCompile Include="src\components\youtube.ts" />
     <TypeScriptCompile Include="src\ngX.components.module.ts" />

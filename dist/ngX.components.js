@@ -360,6 +360,74 @@ var ngX;
 
 //# sourceMappingURL=tabs.js.map
 
+var ngX;
+(function (ngX) {
+    var components;
+    (function (components) {
+        var Vimeo = (function () {
+            function Vimeo($element, $http) {
+                var _this = this;
+                this.$element = $element;
+                this.$http = $http;
+                this.onInit = function () {
+                    return _this.$http.jsonp(_this.embedUrl, {
+                        params: {
+                            url: _this.url,
+                            callback: 'JSON_CALLBACK',
+                            player_id: "1"
+                        }
+                    }).then(function (res) {
+                        _this.$element.html(res.data.html);
+                    });
+                };
+                this.dispose = function () {
+                    _this.$element = null;
+                };
+            }
+            Object.defineProperty(Vimeo.prototype, "height", {
+                get: function () { return this._height; },
+                set: function (value) { this._height = value; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Vimeo.prototype, "width", {
+                get: function () { return this._width; },
+                set: function (value) { this._width = value; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Vimeo.prototype, "videoId", {
+                get: function () { return this._videoId; },
+                set: function (value) { this._videoId = value; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Vimeo.prototype, "url", {
+                get: function () { return "https://vimeo.com/" + this.videoId; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Vimeo.prototype, "embedUrl", {
+                get: function () { return 'https://www.vimeo.com/api/oembed.json'; },
+                enumerable: true,
+                configurable: true
+            });
+            return Vimeo;
+        })();
+        ngX.Component({
+            module: "ngX.components",
+            selector: "vimeo",
+            component: Vimeo,
+            inputs: ["height", "width", "videoId"],
+            providers: ["$element", "$http"],
+            styles: [".vimeo { }"].join(" /n "),
+            template: ["<div></div>"].join(" ")
+        });
+    })(components = ngX.components || (ngX.components = {}));
+})(ngX || (ngX = {}));
+
+//# sourceMappingURL=vimeo.js.map
+
 
 
 //# sourceMappingURL=virtualFor.js.map
