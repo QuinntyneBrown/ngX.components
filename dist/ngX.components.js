@@ -181,13 +181,27 @@ var ngX;
                         itemContent.addClass("slide");
                         fragment.appendChild(itemContent[0]);
                     }
-                    _this.currentIndex = 0;
                     _this.containerNavtiveElement.appendChild(fragment);
                     _this.turnOffTransitions();
-                    var desiredX = Number(_this.width) * (-1);
-                    var delta = desiredX - ((_this.items.length - 1) * Number(_this.width));
-                    _this.translateX(_this.rendererdNodes[_this.items.length - 1].node, delta);
-                    _this.isAnimating = false;
+                    if (_this.queryStringParam && _this.queryStringParam != 0) {
+                        for (var i = _this.slideNavtiveElements.length - 1; i >= 0; i--) {
+                            var initialMoveX = (-1) * (_this.queryStringParamIndex * (Number(_this.width)));
+                            _this.translateX(_this.slideNavtiveElements[i], initialMoveX);
+                        }
+                        for (var i = 0; i < _this.slideNavtiveElements.length; i++) {
+                            if (i < _this.queryStringParamIndex - 1) {
+                                _this.translateX(_this.slideNavtiveElements[i], initialMoveX + Number(_this.width) * _this.items.length);
+                            }
+                        }
+                        _this.currentIndex = _this.queryStringParamIndex;
+                    }
+                    else {
+                        _this.currentIndex = 0;
+                        var desiredX = Number(_this.width) * (-1);
+                        var delta = desiredX - ((_this.items.length - 1) * Number(_this.width));
+                        _this.translateX(_this.rendererdNodes[_this.items.length - 1].node, delta);
+                        _this.isAnimating = false;
+                    }
                     setTimeout(function () {
                         _this.turnOnTransitions();
                     });

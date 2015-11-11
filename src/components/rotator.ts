@@ -40,17 +40,33 @@
                 fragment.appendChild(itemContent[0]);
             }
 
-
-            this.currentIndex = 0;
-
             this.containerNavtiveElement.appendChild(fragment);
 
             this.turnOffTransitions();
 
-            var desiredX = Number(this.width) * (-1);
-            var delta = desiredX - ((this.items.length - 1) * Number(this.width));
-            this.translateX(this.rendererdNodes[this.items.length - 1].node, delta);
-            this.isAnimating = false;
+            if (this.queryStringParam && this.queryStringParam != 0) {
+                for (var i = this.slideNavtiveElements.length - 1; i >= 0; i--) {
+
+                    var initialMoveX = (-1) * (this.queryStringParamIndex * (Number(this.width)));
+
+                    this.translateX(this.slideNavtiveElements[i], initialMoveX);
+                }
+
+                for (var i = 0; i < this.slideNavtiveElements.length; i++) {
+                    if (i < this.queryStringParamIndex - 1) {
+                        this.translateX(this.slideNavtiveElements[i], initialMoveX + Number(this.width) * this.items.length);
+                    }
+                }
+
+                this.currentIndex = this.queryStringParamIndex;
+            } else {
+                this.currentIndex = 0;
+                var desiredX = Number(this.width) * (-1);
+                var delta = desiredX - ((this.items.length - 1) * Number(this.width));
+                this.translateX(this.rendererdNodes[this.items.length - 1].node, delta);
+                this.isAnimating = false;
+                
+            }
 
             setTimeout(() => {
                 this.turnOnTransitions();
