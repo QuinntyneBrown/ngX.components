@@ -22,6 +22,12 @@
 
         private onInit = () => {
 
+            this.$scope.$on("$locationChangeSuccess", () => {
+                if (this.currentIndex != -1 && this.items[this.currentIndex][this.$attrs["querySearchField"] || 'id'] != this.queryStringParam) {
+                    this.moveToIndexAsync({ index: this.queryStringParamIndex });
+                }
+            });
+
             this.$element.find(".view-port").css("width", this.width);
 
             var fragment = document.createDocumentFragment();
@@ -39,11 +45,9 @@
             }
             this.containerNavtiveElement.appendChild(fragment);
 
-            var queryStringValue = this.$location.search()[this.$attrs["querySearchField"] || 'id'];
-
-            if (queryStringValue) {
+            if (this.queryStringParam) {
                 for (var i = 0; i < this.items.length; i++) {
-                    if (this.items[i][this.$attrs["querySearchField"] || 'id'] == queryStringValue) {
+                    if (this.items[i][this.$attrs["querySearchField"] || 'id'] == this.queryStringParam) {
                         this.updateCurrentIndex({ currentIndex: i });
                         var promises = [];
                         this.isAnimating = true;
@@ -65,9 +69,21 @@
 
         }
 
+        public get queryStringParam() { return this.$location.search()[this.$attrs["querySearchField"] || 'id']; }
+
+        public get queryStringParamIndex() {
+            var value = -1;
+            for (var i = 0; i < this.items.length; i++) {
+                if (this.items[i][this.$attrs["querySearchField"] || 'id'] == this.queryStringParam) {
+                    value = i;
+                }
+            }
+
+            return value;
+        }
         public onPreviousAsync = () => {
             var deferred = this.$q.defer();
-            if (!this.isAnimating) {
+            if (!this.isAnimating && this.currentIndex != 0) {
                 var promises = [];
                 this.isAnimating = true;
                 for (var i = 0; i < this.slideNavtiveElements.length; i++) {
@@ -89,7 +105,7 @@
 
         public onNextAsync = () => {
             var deferred = this.$q.defer();
-            if (!this.isAnimating) {
+            if (!this.isAnimating && this.currentIndex != this.items.length - 1) {
                 var promises = [];
                 this.isAnimating = true;
                 for (var i = this.slideNavtiveElements.length - 1; i > -1; i--) {
@@ -109,6 +125,36 @@
             return deferred.promise;
         }
 
+        public moveToIndexAsync = (options: any) => {
+            var deferred = this.$q.defer();
+            var move = 0;
+            if (Number(this.currentIndex) > Number(options.index)) {
+                move = (-1) * (Number(this.width) * (Number(options.index) - Number(this.currentIndex)));
+            } else {
+                move = (-1) * Number(this.width) * (Number(options.index) - Number(this.currentIndex));    
+            }
+
+            if (!this.isAnimating) {
+                var promises = [];
+                this.isAnimating = true;
+                for (var i = this.slideNavtiveElements.length - 1; i > -1; i--) {
+                    promises.push(this.translateXAsync({ element: this.slideNavtiveElements[i], x: (this.getX(this.slideNavtiveElements[i]) + move) }));
+                }
+                this.$q.all(promises).then(() => {
+                    this.updateCurrentIndex({ currentIndex: options.index });
+                    this.isAnimating = false;
+                    deferred.resolve();
+                });
+            } else {
+                deferred.reject();
+            }
+            return deferred.promise;            
+        }
+
+        public atBegining() { return this.currentIndex == 0; }
+
+        public atEnd() { return this.currentIndex == this.items.length - 1; }
+
         public dispose = () => {
             angular.element(this.containerNavtiveElement).find(".slide").remove();
             this.containerNavtiveElement.innerHTML = "";
@@ -122,7 +168,7 @@
 
         public updateCurrentIndex = (options: any) => {
             this.currentIndex = options.currentIndex;
-            this.$scope.$emit("rotatorUpdate", { scope: this.$scope });
+            this.$scope.$emit("componentUpdate", { scope: this.$scope });
             var url = this.items[this.currentIndex][this.$attrs["querySearchField"] || 'id'];
             this.$location.search(this.$attrs["querySearchField"] || 'id', url);
         }
@@ -135,7 +181,7 @@
 
         private clone: any;
 
-        private currentIndex: number = 0;
+        private currentIndex: number = -1;
 
         private get template() { return this.clone.find("slide")[0].innerHTML; }
 
@@ -174,9 +220,6 @@
             "   overflow-x: hidden; ",
             "   overflow-y: hidden; ",
             " } ",
-
-            " .rotator .view-port .previous-arrow, .rotator .view-port .next-arrow { ",
-            "  height:100%; width:80px; } ",
 
             " .rotator .view-port .previous-arrow img, ",
             " .rotator .view-port .next-arrow img { ",
@@ -224,8 +267,8 @@
             "<div class='rotator'> ",
             "<div class='view-port'>",
             "<div class='container'></div>",
-            "<div class='previous-arrow' data-ng-click='vm.onPreviousAsync()'>&nbsp;<img src='{{ vm.previousButtonImageUrl }}' /></div>",
-            "<div class='next-arrow' data-ng-click='vm.onNextAsync()'>&nbsp;<img src='{{ vm.nextButtonImageUrl }}' /></div>",
+            "<div data-ng-hide='vm.atBegining()' class='previous-arrow' data-ng-click='vm.onPreviousAsync()'>&nbsp;<img src='{{ vm.previousButtonImageUrl }}' /></div>",
+            "<div data-ng-hide='vm.atEnd()' class='next-arrow' data-ng-click='vm.onNextAsync()'>&nbsp;<img src='{{ vm.nextButtonImageUrl }}' /></div>",
             "</div>",
             "</div>"
         ].join(" ")
