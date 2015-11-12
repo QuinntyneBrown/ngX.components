@@ -80,7 +80,6 @@
     <Content Include="examples\youtube\home.component.html" />
     <Content Include="examples\youtube\index.html" />
     <Content Include="examples\youtube\video.component.html" />
-    <Content Include="node_modules\ng-x\dist\ngX.js" />
     <Content Include="package.json" />
     <Content Include="dist\ngX.components.min.js.map">
       <DependentUpon>ngX.components.min.js</DependentUpon>
@@ -126,7 +125,9 @@
     <TypeScriptCompile Include="typings\typeScriptApp.d.ts" />
     <TypeScriptCompile Include="typings\youtube\youtube.d.ts" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="node_modules\ng-x\dist\" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

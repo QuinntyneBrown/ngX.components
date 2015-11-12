@@ -207,10 +207,21 @@ var ngX;
                         _this.turnOnTransitions();
                     });
                 };
+                this.onKeyDown = function (event) {
+                    switch (event.keyCode) {
+                        case 37:
+                            _this.onPreviousAsyncDebounce();
+                            break;
+                        case 39:
+                            _this.onNextAsyncDebounce();
+                            break;
+                    }
+                };
                 this.onLocationChangeSuccess = function () {
                     if (_this.currentIndex != -1
                         && _this.items[_this.currentIndex][_this.$attrs["querySearchField"] || 'id'] != _this.queryStringParam
                         && _this.queryStringParamIndex != _this.currentIndex) {
+                        //TO DO: Turn off transitions for manual manipulation of location bar
                         if (_this.currentIndex === _this.items.length - 1 && _this.queryStringParamIndex === 0)
                             return _this.onNextAsync();
                         if (_this.currentIndex === 0 && _this.queryStringParamIndex === _this.items.length - 1)

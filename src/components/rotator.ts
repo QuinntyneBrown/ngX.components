@@ -75,6 +75,16 @@
 
         }
 
+        private onKeyDown = (event:KeyboardEvent) => {
+            switch (event.keyCode) {
+                case 37:
+                    this.onPreviousAsyncDebounce();
+                    break;
+                case 39:
+                    this.onNextAsyncDebounce();
+                    break;
+            }
+        }
         private onLocationChangeSuccess = () => {
             if (this.currentIndex != -1
                 && this.items[this.currentIndex][this.$attrs["querySearchField"] || 'id'] != this.queryStringParam
