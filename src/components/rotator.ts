@@ -60,13 +60,10 @@
                 var desiredX = Number(this.width) * (-1);
                 var delta = desiredX - ((this.items.length - 1) * Number(this.width));
                 this.translateX(this.rendererdNodes[this.items.length - 1].node, delta);
-                this.isAnimating = false;
-                
+                this.isAnimating = false;                
             }
 
-            setTimeout(() => {
-                this.turnOnTransitions();
-            });
+            setTimeout(() => { this.turnOnTransitions(); });
 
         }
 

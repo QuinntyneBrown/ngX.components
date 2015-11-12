@@ -137,7 +137,43 @@ var ngX;
 
 //# sourceMappingURL=listDetail.js.map
 
-
+var ngX;
+(function (ngX) {
+    var components;
+    (function (components) {
+        function LoginFormComponent() {
+            var self = this;
+            return self;
+        }
+        ngX.Component({
+            module: "ngX.components",
+            selector: "ng-x-login-form",
+            component: LoginFormComponent,
+            delegates: ["tryToLogin"],
+            styles: [
+                ".ng-x-login-form { ",
+                " }"
+            ].join(" \n "),
+            template: [
+                "<div>",
+                "<form name'loginForm'>",
+                "<div class='form-control'>",
+                "<a class='label'>Username:</a>",
+                "<input type='text'></input>",
+                "</div>",
+                "<div class='form-control'>",
+                "<a class='label'>Password:</a>",
+                "<input type='passwor'></input>",
+                "</div>",
+                "<div>",
+                "<input type='submit' value='login'></input>",
+                "</div>",
+                "</form>",
+                "</div>"
+            ].join(" ")
+        });
+    })(components = ngX.components || (ngX.components = {}));
+})(ngX || (ngX = {}));
 
 //# sourceMappingURL=loginForm.js.map
 
@@ -203,9 +239,7 @@ var ngX;
                         _this.translateX(_this.rendererdNodes[_this.items.length - 1].node, delta);
                         _this.isAnimating = false;
                     }
-                    setTimeout(function () {
-                        _this.turnOnTransitions();
-                    });
+                    setTimeout(function () { _this.turnOnTransitions(); });
                 };
                 this.onKeyDown = function (event) {
                     switch (event.keyCode) {
