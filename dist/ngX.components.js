@@ -184,14 +184,14 @@ var ngX;
                     }
                     _this.containerNavtiveElement.appendChild(fragment);
                     _this.turnOffTransitions();
-                    if (_this.queryStringParam && _this.queryStringParam != 0) {
+                    if (_this.queryStringParam && _this.queryStringParamIndex != 0) {
                         for (var i = _this.slideNavtiveElements.length - 1; i >= 0; i--) {
                             var initialMoveX = (-1) * (_this.queryStringParamIndex * (Number(_this.width)));
-                            _this.translateX(_this.slideNavtiveElements[i], initialMoveX);
-                        }
-                        for (var i = 0; i < _this.slideNavtiveElements.length; i++) {
-                            if (i < _this.queryStringParamIndex - 1) {
+                            if (i < _this.queryStringParamIndex - _this.buffer) {
                                 _this.translateX(_this.slideNavtiveElements[i], initialMoveX + Number(_this.width) * _this.items.length);
+                            }
+                            else {
+                                _this.translateX(_this.slideNavtiveElements[i], initialMoveX);
                             }
                         }
                         _this.currentIndex = _this.queryStringParamIndex;
@@ -303,6 +303,11 @@ var ngX;
                 this._currentIndex = -1;
                 this._template = null;
             }
+            Object.defineProperty(Rotator.prototype, "buffer", {
+                get: function () { return 1; },
+                enumerable: true,
+                configurable: true
+            });
             Object.defineProperty(Rotator.prototype, "queryStringParam", {
                 get: function () { return this.$location.search()[this.$attrs["querySearchField"] || 'id']; },
                 enumerable: true,

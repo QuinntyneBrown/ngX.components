@@ -45,20 +45,15 @@
 
             this.turnOffTransitions();
 
-            if (this.queryStringParam && this.queryStringParam != 0) {
+            if (this.queryStringParam && this.queryStringParamIndex != 0) {
                 for (var i = this.slideNavtiveElements.length - 1; i >= 0; i--) {
-
                     var initialMoveX = (-1) * (this.queryStringParamIndex * (Number(this.width)));
-
-                    this.translateX(this.slideNavtiveElements[i], initialMoveX);
-                }
-
-                for (var i = 0; i < this.slideNavtiveElements.length; i++) {
-                    if (i < this.queryStringParamIndex - 1) {
+                    if (i < this.queryStringParamIndex - this.buffer) {
                         this.translateX(this.slideNavtiveElements[i], initialMoveX + Number(this.width) * this.items.length);
-                    }
+                    } else {
+                        this.translateX(this.slideNavtiveElements[i], initialMoveX);    
+                    }                    
                 }
-
                 this.currentIndex = this.queryStringParamIndex;
             } else {
                 this.currentIndex = 0;
@@ -74,6 +69,8 @@
             });
 
         }
+
+        private get buffer() { return 1; }
 
         private onKeyDown = (event:KeyboardEvent) => {
             switch (event.keyCode) {
