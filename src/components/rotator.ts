@@ -16,6 +16,7 @@
             private $scope: ng.IScope,
             private $timeout: ng.ITimeoutService,
             private $transclude: Function,
+            private debounce: Function,
             private getFromUrlSync: Function,
             private getX: Function,
             private translateX: Function,
@@ -75,9 +76,24 @@
         }
 
         private onLocationChangeSuccess = () => {
-            //if (this.currentIndex != -1 && this.items[this.currentIndex][this.$attrs["querySearchField"] || 'id'] != this.queryStringParam) {
-            //    this.moveToIndexAsync({ index: this.queryStringParamIndex });
-            //}
+            if (this.currentIndex != -1
+                && this.items[this.currentIndex][this.$attrs["querySearchField"] || 'id'] != this.queryStringParam
+                && this.queryStringParamIndex != this.currentIndex) {
+
+                //TO DO: Turn off transitions for manual manipulation of location bar
+                if (this.currentIndex === this.items.length -1 && this.queryStringParamIndex === 0)
+                    return this.onNextAsync();
+
+                if (this.currentIndex === 0 && this.queryStringParamIndex === this.items.length - 1)
+                    return this.onPreviousAsync();
+
+                if ((this.currentIndex - this.queryStringParamIndex) < 0) {
+                    return this.onNextAsync();
+                } else {
+                    return this.onPreviousAsync();
+                }
+                
+            }
         }
 
         public get queryStringParam() { return this.$location.search()[this.$attrs["querySearchField"] || 'id']; }
@@ -91,6 +107,8 @@
             }
             return value;
         }
+
+        public onPreviousAsyncDebounce = () => { this.debounce(this.onPreviousAsync, 100)(); }
 
         public onPreviousAsync = () => {
             return this.move({ x: (Number(this.width)) }).then(() => {
@@ -106,6 +124,8 @@
                 }, 300);
             });
         }
+
+        public onNextAsyncDebounce = () => { this.debounce(this.onNextAsync, 100)(); }
 
         public onNextAsync = () => {
             return this.move({ x: (-1) * (Number(this.width)) }).then(() => {
@@ -177,12 +197,10 @@
         private get currentIndex() { return this._currentIndex; }
 
         private set currentIndex(value: number) {
-
             this._currentIndex = value;
             this.$scope.$emit("componentUpdate", { scope: this.$scope });
             var url = this.items[this.currentIndex][this.$attrs["querySearchField"] || 'id'];
             this.$location.search(this.$attrs["querySearchField"] || 'id', url);
-
         }
 
         private _template: string = null;
@@ -296,6 +314,7 @@
             "$scope",
             "$timeout",
             "$transclude",
+            "debounce",
             "getFromUrlSync",
             "getX",
             "translateX",
@@ -305,8 +324,8 @@
             "<div class='rotator'> ",
             "<div class='view-port'>",
             "<div class='container'></div>",
-            "<div class='previous-arrow' data-ng-click='vm.onPreviousAsync()'>&nbsp;<img src='{{ vm.previousButtonImageUrl }}' /></div>",
-            "<div class='next-arrow' data-ng-click='vm.onNextAsync()'>&nbsp;<img src='{{ vm.nextButtonImageUrl }}' /></div>",
+            "<div class='previous-arrow' data-ng-click='vm.onPreviousAsyncDebounce()'>&nbsp;<img src='{{ vm.previousButtonImageUrl }}' /></div>",
+            "<div class='next-arrow' data-ng-click='vm.onNextAsyncDebounce()'>&nbsp;<img src='{{ vm.nextButtonImageUrl }}' /></div>",
             "</div>",
             "</div>"
         ].join(" ")

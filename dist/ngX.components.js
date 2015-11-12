@@ -150,7 +150,7 @@ var ngX;
          * @module ngX.components
          */
         var Rotator = (function () {
-            function Rotator($attrs, $compile, $element, $http, $interval, $location, $q, $scope, $timeout, $transclude, getFromUrlSync, getX, translateX, translateXAsync) {
+            function Rotator($attrs, $compile, $element, $http, $interval, $location, $q, $scope, $timeout, $transclude, debounce, getFromUrlSync, getX, translateX, translateXAsync) {
                 var _this = this;
                 this.$attrs = $attrs;
                 this.$compile = $compile;
@@ -162,6 +162,7 @@ var ngX;
                 this.$scope = $scope;
                 this.$timeout = $timeout;
                 this.$transclude = $transclude;
+                this.debounce = debounce;
                 this.getFromUrlSync = getFromUrlSync;
                 this.getX = getX;
                 this.translateX = translateX;
@@ -207,10 +208,22 @@ var ngX;
                     });
                 };
                 this.onLocationChangeSuccess = function () {
-                    //if (this.currentIndex != -1 && this.items[this.currentIndex][this.$attrs["querySearchField"] || 'id'] != this.queryStringParam) {
-                    //    this.moveToIndexAsync({ index: this.queryStringParamIndex });
-                    //}
+                    if (_this.currentIndex != -1
+                        && _this.items[_this.currentIndex][_this.$attrs["querySearchField"] || 'id'] != _this.queryStringParam
+                        && _this.queryStringParamIndex != _this.currentIndex) {
+                        if (_this.currentIndex === _this.items.length - 1 && _this.queryStringParamIndex === 0)
+                            return _this.onNextAsync();
+                        if (_this.currentIndex === 0 && _this.queryStringParamIndex === _this.items.length - 1)
+                            return _this.onPreviousAsync();
+                        if ((_this.currentIndex - _this.queryStringParamIndex) < 0) {
+                            return _this.onNextAsync();
+                        }
+                        else {
+                            return _this.onPreviousAsync();
+                        }
+                    }
                 };
+                this.onPreviousAsyncDebounce = function () { _this.debounce(_this.onPreviousAsync, 100)(); };
                 this.onPreviousAsync = function () {
                     return _this.move({ x: (Number(_this.width)) }).then(function () {
                         _this.turnOffTransitions();
@@ -225,6 +238,7 @@ var ngX;
                         }, 300);
                     });
                 };
+                this.onNextAsyncDebounce = function () { _this.debounce(_this.onNextAsync, 100)(); };
                 this.onNextAsync = function () {
                     return _this.move({ x: (-1) * (Number(_this.width)) }).then(function () {
                         _this.turnOffTransitions();
@@ -414,6 +428,7 @@ var ngX;
                 "$scope",
                 "$timeout",
                 "$transclude",
+                "debounce",
                 "getFromUrlSync",
                 "getX",
                 "translateX",
@@ -423,8 +438,8 @@ var ngX;
                 "<div class='rotator'> ",
                 "<div class='view-port'>",
                 "<div class='container'></div>",
-                "<div class='previous-arrow' data-ng-click='vm.onPreviousAsync()'>&nbsp;<img src='{{ vm.previousButtonImageUrl }}' /></div>",
-                "<div class='next-arrow' data-ng-click='vm.onNextAsync()'>&nbsp;<img src='{{ vm.nextButtonImageUrl }}' /></div>",
+                "<div class='previous-arrow' data-ng-click='vm.onPreviousAsyncDebounce()'>&nbsp;<img src='{{ vm.previousButtonImageUrl }}' /></div>",
+                "<div class='next-arrow' data-ng-click='vm.onNextAsyncDebounce()'>&nbsp;<img src='{{ vm.nextButtonImageUrl }}' /></div>",
                 "</div>",
                 "</div>"
             ].join(" ")
