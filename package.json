@@ -1,6 +1,6 @@
 {
   "name": "ng-x-components",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Angular 1.x components created using ngX",
   "main": "index.ts",
   "directories": {
@@ -47,6 +47,6 @@
   "dependencies": {
     "angular": "^1.4.7",
     "angular-route": "^1.4.7",
-    "ng-x": "*"
+    "ng-x": "^0.3.50"
   }
 }

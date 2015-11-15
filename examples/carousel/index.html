@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <title>Carousel</title>
+    <title>Rotator</title>
     <style>
         * {
             padding: 0;
@@ -11,22 +11,20 @@
 </head>
 <body data-ng-app="ngX.components" data-ng-controller="pageController as vm">
 
-    <div style="overflow-x: hidden; overflow-y: hidden;">
+    <div style="overflow-x: hidden; overflow-y: hidden; height: 800px; width: 100%;">
 
-        <rotator id="featured"
-                 items="vm.photos"
-                 rotator-for-name="photo"
-                 next-button-image-url="'../../assets/images/rotator_button_next.png'"
-                 previous-button-image-url="'../../assets/images/rotator_button_prev.png'"
-                 query-search-field="title"
-                 width="'1200'"
-                 height='800'>
-
-            <slide>
-                <img src="{{ photo.imageUrl }}" />
-            </slide>
-
-        </rotator>
+        <div style="width:1200px; height: 800px; margin: 0 auto;">
+            <carousel id="featured"
+                     items="vm.photos"
+                     carousel-for-name="photo"
+                     next-button-image-url="'../../assets/images/carousel_button_next.png'"
+                     previous-button-image-url="'../../assets/images/carousel_button_prev.png'"
+                     query-search-field="name"
+                     width="'360'"
+                     height='240'
+                     content-url="slide.html">
+            </carousel>
+        </div>
 
     </div>
 
@@ -40,20 +38,20 @@
         function pageController($scope) {
 
             $scope.$on("componentUpdate", function (event, obj) {
-                console.log(obj.scope.vm.$attrs["title"] + " : " + obj.scope.vm.currentIndex);
+                console.log(obj.scope.vm.currentIndex);
             });
 
             var self = this;
 
 
             self.photos = [
-                { imageUrl: "../../assets/images/photo1.jpg", title:"snacks" },
-                { imageUrl: "../../assets/images/photo2.jpg", title:"jae_and_mom" },
-                { imageUrl: "../../assets/images/photo3.jpg", title:"gifts" },
-                { imageUrl: "../../assets/images/photo4.jpg", title:"QB_da_boss" },
-                { imageUrl: "../../assets/images/photo5.jpg", title:"reading" },
-                { imageUrl: "../../assets/images/photo6.jpg", title:"cake_cake" },
-                { imageUrl: "../../assets/images/photo7.jpg", title:"laughing" }
+                { imageUrl: "../../assets/images/photo1_sm.jpg", name: "photo1.jpg", title: "snacks" },
+                { imageUrl: "../../assets/images/photo2_sm.jpg", name: "photo2.jpg", title: "jae_and_mom" },
+                { imageUrl: "../../assets/images/photo3_sm.jpg", name: "photo3.jpg", title: "gifts" },
+                { imageUrl: "../../assets/images/photo4_sm.jpg", name: "photo4.jpg", title: "QB_da_boss" },
+                { imageUrl: "../../assets/images/photo5_sm.jpg", name: "photo5.jpg", title: "reading" },
+                { imageUrl: "../../assets/images/photo6_sm.jpg", name: "photo6.jpg", title: "cake_cake" },
+                { imageUrl: "../../assets/images/photo7_sm.jpg", name: "photo7.jpg", title: "laughing" }
             ];
 
             return self;

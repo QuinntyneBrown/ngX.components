@@ -6,6 +6,261 @@ var ngX;
 (function (ngX) {
     var components;
     (function (components) {
+        /**
+         * @name carousel
+         * @module ngX.components
+         */
+        var carousel = (function () {
+            function carousel($attrs, $compile, $element, $http, $interval, $location, $q, $scope, $timeout, $transclude, debounce, getFromUrlSync, getX, translateX, translateXAsync) {
+                var _this = this;
+                this.$attrs = $attrs;
+                this.$compile = $compile;
+                this.$element = $element;
+                this.$http = $http;
+                this.$interval = $interval;
+                this.$location = $location;
+                this.$q = $q;
+                this.$scope = $scope;
+                this.$timeout = $timeout;
+                this.$transclude = $transclude;
+                this.debounce = debounce;
+                this.getFromUrlSync = getFromUrlSync;
+                this.getX = getX;
+                this.translateX = translateX;
+                this.translateXAsync = translateXAsync;
+                this.onInit = function () {
+                    _this.$element.find(".view-port").css("width", _this.$element.width());
+                    var fragment = document.createDocumentFragment();
+                    for (var i = 0; i < _this.items.length; i++) {
+                        var childScope = _this.$scope.$new(true);
+                        childScope[_this.$attrs["carouselForName"] || "carouselItem"] = _this.items[i];
+                        childScope.width = _this.width;
+                        childScope.height = _this.height;
+                        childScope.$$index = i;
+                        childScope.$$isFirst = (i === 0);
+                        childScope.$$isLast = (i === _this.items.length - 1);
+                        var itemContent = _this.$compile(angular.element(_this.template))(childScope);
+                        itemContent.addClass("slide");
+                        fragment.appendChild(itemContent[0]);
+                    }
+                    _this.containerNavtiveElement.appendChild(fragment);
+                    setTimeout(function () {
+                        _this.turnOffTransitions();
+                        _this.currentIndex = 0;
+                        var desiredX = -1 * Number(_this.width);
+                        var delta = desiredX - ((_this.items.length - 1) * Number(_this.width));
+                        _this.translateX(_this.rendererdNodes[_this.items.length - 1].node, delta);
+                        _this.isAnimating = false;
+                        setTimeout(function () { _this.turnOnTransitions(); });
+                    }, 300);
+                };
+                this.onPreviousAsyncDebounce = function () { _this.debounce(_this.onPreviousAsync, 100)(); };
+                this.onPreviousAsync = function () {
+                    return _this.move({ x: (Number(_this.width)) }).then(function () {
+                        _this.turnOffTransitions();
+                        var desiredX = -1 * Number(_this.width);
+                        var delta = desiredX - _this.rendererdNodes[_this.items.length - 1].offsetLeft;
+                        _this.translateX(_this.rendererdNodes[_this.items.length - 1].node, delta);
+                        _this.isAnimating = false;
+                        setTimeout(function () { _this.turnOnTransitions(); });
+                    });
+                };
+                this.onNextAsyncDebounce = function () { _this.debounce(_this.onNextAsync, 100)(); };
+                this.onNextAsync = function () {
+                    return _this.move({ x: (-1) * (Number(_this.width)) }).then(function () {
+                        _this.turnOffTransitions();
+                        var desiredX = (_this.items.length - 2) * Number(_this.width);
+                        var delta = desiredX - _this.rendererdNodes[0].offsetLeft;
+                        _this.translateX(_this.rendererdNodes[0].node, delta);
+                        _this.isAnimating = false;
+                        setTimeout(function () { _this.turnOnTransitions(); });
+                    });
+                };
+                this.move = function (options) {
+                    var deferred = _this.$q.defer();
+                    if (!_this.isAnimating && !_this.inTransition) {
+                        var promises = [];
+                        _this.isAnimating = true;
+                        if (options.x < 0) {
+                            for (var i = _this.slideNavtiveElements.length - 1; i > -1; i--) {
+                                promises.push(_this.translateXAsync({ element: _this.slideNavtiveElements[i], x: (_this.getX(_this.slideNavtiveElements[i]) + options.x) }));
+                            }
+                        }
+                        if (options.x >= 0) {
+                            for (var i = 0; i < _this.slideNavtiveElements.length; i++) {
+                                promises.push(_this.translateXAsync({ element: _this.slideNavtiveElements[i], x: (_this.getX(_this.slideNavtiveElements[i]) + options.x) }));
+                            }
+                        }
+                        _this.$q.all(promises).then(function () {
+                            _this.isAnimating = false;
+                            deferred.resolve();
+                        });
+                    }
+                    else {
+                        deferred.reject();
+                    }
+                    return deferred.promise;
+                };
+                this.dispose = function () {
+                    angular.element(_this.containerNavtiveElement).find(".slide").remove();
+                    _this.containerNavtiveElement.innerHTML = "";
+                    _this.$element[0].innerHTML = null;
+                    _this.$element = null;
+                    _this.$attrs = null;
+                    _this.clone = null;
+                    delete _this.$element;
+                    delete _this.clone;
+                };
+                this.turnOffTransitions = function () { _this.$element.addClass("notransition"); };
+                this._currentIndex = -1;
+                this._template = null;
+            }
+            Object.defineProperty(carousel.prototype, "buffer", {
+                get: function () { return 1; },
+                enumerable: true,
+                configurable: true
+            });
+            carousel.prototype.atBegining = function () { return this.currentIndex == 0; };
+            carousel.prototype.atEnd = function () { return this.currentIndex == this.items.length - 1; };
+            carousel.prototype.turnOnTransitions = function () { this.$element.removeClass("notransition"); };
+            Object.defineProperty(carousel.prototype, "slideNavtiveElements", {
+                get: function () { return this.containerNavtiveElement.children; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(carousel.prototype, "currentIndex", {
+                get: function () { return this._currentIndex; },
+                set: function (value) {
+                    this._currentIndex = value;
+                    this.$scope.$emit("componentUpdate", { scope: this.$scope });
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(carousel.prototype, "template", {
+                get: function () {
+                    if (this._template != null)
+                        return this._template;
+                    if (this.$attrs["contentUrl"]) {
+                        this._template = this.getFromUrlSync({ url: this.$attrs["contentUrl"] });
+                    }
+                    else {
+                        this._template = this.clone.find("content")[0].innerHTML;
+                    }
+                    return this._template;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(carousel.prototype, "containerNavtiveElement", {
+                get: function () { return this.$element.find(".container")[0]; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(carousel.prototype, "rendererdNodes", {
+                get: function () {
+                    var renderedNodes = [];
+                    for (var i = 0; i < this.slideNavtiveElements.length; i++) {
+                        var x = this.getX(this.slideNavtiveElements[i]);
+                        var offsetLeft = this.slideNavtiveElements[i].offsetLeft;
+                        var left = x + offsetLeft;
+                        var node = this.slideNavtiveElements[i];
+                        renderedNodes.push({
+                            x: x,
+                            offsetLeft: offsetLeft,
+                            left: left,
+                            node: node
+                        });
+                    }
+                    return renderedNodes.sort(function (a, b) {
+                        return a.left - b.left;
+                    });
+                },
+                enumerable: true,
+                configurable: true
+            });
+            return carousel;
+        })();
+        components.carousel = carousel;
+        ngX.Component({
+            module: "ngX.components",
+            selector: "carousel",
+            component: carousel,
+            transclude: "element",
+            inputs: [
+                "height",
+                "items",
+                "nextButtonImageUrl",
+                "previousButtonImageUrl",
+                "width"
+            ],
+            styles: [
+                " .carousel .slide { ",
+                "   transition: transform 0.5s cubic-bezier(0.1, 0.1, 0.25, 0.9); } ",
+                " .notransition .slide { ",
+                "  transition: none !important; } ",
+                " .carousel .view-port { height:100%; ",
+                "   position: relative; ",
+                "   overflow-x: hidden; ",
+                "   overflow-y: hidden; ",
+                " } ",
+                " .carousel .view-port .previous-arrow img, ",
+                " .carousel .view-port .next-arrow img { ",
+                "   position: absolute; ",
+                "   top: calc(50% - 40px); ",
+                "   cursor: pointer; ",
+                "   left: 0; ",
+                "   z-index: 999; ",
+                "   opacity: .3; ",
+                "   transition: all .250s; } ",
+                " .carousel .view-port .next-arrow img { ",
+                "   left: calc(100% - 80px); } ",
+                " .carousel .view-port .container { ",
+                "   width: 99999px; } ",
+                " .carousel .view-port .previous-arrow img:hover, ",
+                " .carousel .view-port .next-arrow img:hover { ",
+                "   opacity: .9; transform: scale(1.5,1.5); } ",
+                " .carousel .view-port .slide { ",
+                "   position: relative; ",
+                "   float: left; ",
+                "   margin: 0 auto; } "
+            ].join("\n"),
+            providers: [
+                "$attrs",
+                "$compile",
+                "$element",
+                "$http",
+                "$interval",
+                "$location",
+                "$q",
+                "$scope",
+                "$timeout",
+                "$transclude",
+                "debounce",
+                "getFromUrlSync",
+                "getX",
+                "translateX",
+                "translateXAsync"
+            ],
+            template: [
+                "<div class='carousel'> ",
+                "<div class='view-port'>",
+                "<div class='container'></div>",
+                "<div class='previous-arrow' data-ng-click='vm.onPreviousAsyncDebounce()'>&nbsp;<img src='{{ vm.previousButtonImageUrl }}' /></div>",
+                "<div class='next-arrow' data-ng-click='vm.onNextAsyncDebounce()'>&nbsp;<img src='{{ vm.nextButtonImageUrl }}' /></div>",
+                "</div>",
+                "</div>"
+            ].join(" ")
+        });
+    })(components = ngX.components || (ngX.components = {}));
+})(ngX || (ngX = {}));
+
+//# sourceMappingURL=carousel.js.map
+
+var ngX;
+(function (ngX) {
+    var components;
+    (function (components) {
         ngX.Component({
             module: "ngX.components",
             selector: "ng-x-footer",

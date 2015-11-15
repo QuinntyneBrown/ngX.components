@@ -21,6 +21,7 @@
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
     <TypeScriptToolsVersion>1.6</TypeScriptToolsVersion>
+    <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -59,19 +60,29 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="assets\images\carousel_button_next.png" />
+    <Content Include="assets\images\carousel_button_prev.png" />
+    <Content Include="assets\images\photo1.jpg" />
+    <Content Include="assets\images\photo1_sm.jpg" />
+    <Content Include="assets\images\photo2.jpg" />
+    <Content Include="assets\images\photo2_sm.jpg" />
+    <Content Include="assets\images\photo3.jpg" />
+    <Content Include="assets\images\photo3_sm.jpg" />
+    <Content Include="assets\images\photo4.jpg" />
+    <Content Include="assets\images\photo4_sm.jpg" />
+    <Content Include="assets\images\photo5.jpg" />
+    <Content Include="assets\images\photo5_sm.jpg" />
+    <Content Include="assets\images\photo6.jpg" />
+    <Content Include="assets\images\photo6_sm.jpg" />
+    <Content Include="assets\images\photo7.jpg" />
+    <Content Include="assets\images\photo7_sm.jpg" />
     <Content Include="assets\images\rotator_button_next.png" />
     <Content Include="assets\images\rotator_button_prev.png" />
-    <Content Include="assets\images\photo1.jpg" />
-    <Content Include="assets\images\photo2.jpg" />
-    <Content Include="assets\images\photo3.jpg" />
-    <Content Include="assets\images\photo4.jpg" />
-    <Content Include="assets\images\photo5.jpg" />
-    <Content Include="assets\images\photo6.jpg" />
-    <Content Include="assets\images\photo7.jpg" />
     <Content Include="dist\ngX.components.min.js">
       <DependentUpon>ngX.components.js</DependentUpon>
     </Content>
     <Content Include="examples\carousel\index.html" />
+    <Content Include="examples\carousel\slide.html" />
     <Content Include="examples\listDetail\index.html" />
     <Content Include="examples\rotator\index.html" />
     <Content Include="examples\rotator\slide.html" />
@@ -80,7 +91,6 @@
     <Content Include="examples\youtube\home.component.html" />
     <Content Include="examples\youtube\index.html" />
     <Content Include="examples\youtube\video.component.html" />
-    <Content Include="package.json" />
     <Content Include="dist\ngX.components.min.js.map">
       <DependentUpon>ngX.components.min.js</DependentUpon>
     </Content>
@@ -99,13 +109,13 @@
     <Content Include="karma.conf.js" />
     <Content Include="node_modules\angular-route\angular-route.js" />
     <Content Include="node_modules\angular\angular.js" />
-    <Content Include="node_modules\ngX\dist\ngX.js" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="src\components\carousel.ts" />
     <TypeScriptCompile Include="src\components\footer.ts" />
     <TypeScriptCompile Include="src\components\hamburgerButton.ts" />
     <TypeScriptCompile Include="src\components\header.ts" />
@@ -125,9 +135,7 @@
     <TypeScriptCompile Include="typings\typeScriptApp.d.ts" />
     <TypeScriptCompile Include="typings\youtube\youtube.d.ts" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="node_modules\ng-x\dist\" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
