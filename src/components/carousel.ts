@@ -22,6 +22,8 @@
             private translateX: Function,
             private translateXAsync: Function) { }
 
+        private get startIndex() { return 80; }
+
         private onInit = () => {
 
             this.$element.find(".view-port").css("width", this.$element.width());
@@ -47,12 +49,18 @@
 
                 this.turnOffTransitions();
 
-                this.currentIndex = 0;
-                var desiredX = -1 * Number(this.width);
-                var delta = desiredX - ((this.items.length - 1) * Number(this.width));
-                this.translateX(this.rendererdNodes[this.items.length - 1].node, delta);
-                this.isAnimating = false;
+                for (var i = 0; i < this.slideNavtiveElements.length; i++) {
+                    this.translateX(this.slideNavtiveElements[i], this.startIndex);
+                }
 
+                for (var i = 1; i <= this.buffer; i++) {
+                    this.currentIndex = 0;
+                    var desiredX = -1 * (Number(this.width) * i);
+                    var delta = desiredX - ((this.items.length - i) * Number(this.width));
+                    this.translateX(this.rendererdNodes[this.items.length - 1].node, delta + this.startIndex);
+                    this.isAnimating = false;
+                }
+                
                 setTimeout(() => { this.turnOnTransitions(); });
 
             }, 300);
@@ -60,16 +68,16 @@
 
         }
 
-        private get buffer() { return 1; }
+        private get buffer() { return 2; }
 
         public onPreviousAsyncDebounce = () => { this.debounce(this.onPreviousAsync, 100)(); }
 
         public onPreviousAsync = () => {
             return this.move({ x: (Number(this.width)) }).then(() => {
                 this.turnOffTransitions();                
-                var desiredX = -1 * Number(this.width);
+                var desiredX = -1 * (Number(this.width) * this.buffer);
                 var delta = desiredX - this.rendererdNodes[this.items.length - 1].offsetLeft;
-                this.translateX(this.rendererdNodes[this.items.length - 1].node, delta);
+                this.translateX(this.rendererdNodes[this.items.length - 1].node, delta + this.startIndex);
                 this.isAnimating = false;
                 setTimeout(() => { this.turnOnTransitions(); });
             });
@@ -80,9 +88,9 @@
         public onNextAsync = () => {
             return this.move({ x: (-1) * (Number(this.width)) }).then(() => {
                 this.turnOffTransitions();
-                var desiredX = (this.items.length - 2) * Number(this.width);
+                var desiredX = (this.items.length - 1 - this.buffer) * Number(this.width);
                 var delta = desiredX - this.rendererdNodes[0].offsetLeft;
-                this.translateX(this.rendererdNodes[0].node, delta);
+                this.translateX(this.rendererdNodes[0].node, delta + this.startIndex);
                 this.isAnimating = false;
                 setTimeout(() => { this.turnOnTransitions(); });
             });
@@ -218,6 +226,11 @@
             "   position: relative; ",
             "   overflow-x: hidden; ",
             "   overflow-y: hidden; ",
+            " } ",
+
+            " .carousel .view-port .previous-arrow, ",
+            " .carousel .view-port .next-arrow { ",
+            "   background-color: #fff; z-index:999; height:100%;",
             " } ",
 
             " .carousel .view-port .previous-arrow img, ",

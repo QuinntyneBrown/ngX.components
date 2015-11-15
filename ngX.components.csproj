@@ -122,6 +122,7 @@
     <TypeScriptCompile Include="src\components\listDetail.ts" />
     <TypeScriptCompile Include="src\components\loginForm.ts" />
     <TypeScriptCompile Include="src\components\rotator.ts" />
+    <TypeScriptCompile Include="src\components\scrollHeader.ts" />
     <TypeScriptCompile Include="src\components\socialMediaMetaTag.ts" />
     <TypeScriptCompile Include="src\components\tabs.ts" />
     <TypeScriptCompile Include="src\components\vimeo.ts" />

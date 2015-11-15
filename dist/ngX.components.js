@@ -46,11 +46,16 @@ var ngX;
                     _this.containerNavtiveElement.appendChild(fragment);
                     setTimeout(function () {
                         _this.turnOffTransitions();
-                        _this.currentIndex = 0;
-                        var desiredX = -1 * Number(_this.width);
-                        var delta = desiredX - ((_this.items.length - 1) * Number(_this.width));
-                        _this.translateX(_this.rendererdNodes[_this.items.length - 1].node, delta);
-                        _this.isAnimating = false;
+                        for (var i = 0; i < _this.slideNavtiveElements.length; i++) {
+                            _this.translateX(_this.slideNavtiveElements[i], _this.startIndex);
+                        }
+                        for (var i = 1; i <= _this.buffer; i++) {
+                            _this.currentIndex = 0;
+                            var desiredX = -1 * (Number(_this.width) * i);
+                            var delta = desiredX - ((_this.items.length - i) * Number(_this.width));
+                            _this.translateX(_this.rendererdNodes[_this.items.length - 1].node, delta + _this.startIndex);
+                            _this.isAnimating = false;
+                        }
                         setTimeout(function () { _this.turnOnTransitions(); });
                     }, 300);
                 };
@@ -58,9 +63,9 @@ var ngX;
                 this.onPreviousAsync = function () {
                     return _this.move({ x: (Number(_this.width)) }).then(function () {
                         _this.turnOffTransitions();
-                        var desiredX = -1 * Number(_this.width);
+                        var desiredX = -1 * (Number(_this.width) * _this.buffer);
                         var delta = desiredX - _this.rendererdNodes[_this.items.length - 1].offsetLeft;
-                        _this.translateX(_this.rendererdNodes[_this.items.length - 1].node, delta);
+                        _this.translateX(_this.rendererdNodes[_this.items.length - 1].node, delta + _this.startIndex);
                         _this.isAnimating = false;
                         setTimeout(function () { _this.turnOnTransitions(); });
                     });
@@ -69,9 +74,9 @@ var ngX;
                 this.onNextAsync = function () {
                     return _this.move({ x: (-1) * (Number(_this.width)) }).then(function () {
                         _this.turnOffTransitions();
-                        var desiredX = (_this.items.length - 2) * Number(_this.width);
+                        var desiredX = (_this.items.length - 1 - _this.buffer) * Number(_this.width);
                         var delta = desiredX - _this.rendererdNodes[0].offsetLeft;
-                        _this.translateX(_this.rendererdNodes[0].node, delta);
+                        _this.translateX(_this.rendererdNodes[0].node, delta + _this.startIndex);
                         _this.isAnimating = false;
                         setTimeout(function () { _this.turnOnTransitions(); });
                     });
@@ -115,8 +120,13 @@ var ngX;
                 this._currentIndex = -1;
                 this._template = null;
             }
+            Object.defineProperty(carousel.prototype, "startIndex", {
+                get: function () { return 80; },
+                enumerable: true,
+                configurable: true
+            });
             Object.defineProperty(carousel.prototype, "buffer", {
-                get: function () { return 1; },
+                get: function () { return 2; },
                 enumerable: true,
                 configurable: true
             });
@@ -203,6 +213,10 @@ var ngX;
                 "   position: relative; ",
                 "   overflow-x: hidden; ",
                 "   overflow-y: hidden; ",
+                " } ",
+                " .carousel .view-port .previous-arrow, ",
+                " .carousel .view-port .next-arrow { ",
+                "   background-color: #fff; z-index:999; height:100%;",
                 " } ",
                 " .carousel .view-port .previous-arrow img, ",
                 " .carousel .view-port .next-arrow img { ",
@@ -753,6 +767,10 @@ var ngX;
 })(ngX || (ngX = {}));
 
 //# sourceMappingURL=rotator.js.map
+
+
+
+//# sourceMappingURL=scrollHeader.js.map
 
 var ngX;
 (function (ngX) {
