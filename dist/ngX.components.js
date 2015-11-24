@@ -6,6 +6,100 @@ var ngX;
 (function (ngX) {
     var components;
     (function (components) {
+        "use strict";
+        /**
+         * @name BackDrop
+         * @module ngX.components
+         */
+        var BackDrop = (function () {
+            function BackDrop($q, appendToBodyAsync, extendCssAsync, removeElement, setOpacityAsync) {
+                var _this = this;
+                this.$q = $q;
+                this.appendToBodyAsync = appendToBodyAsync;
+                this.extendCssAsync = extendCssAsync;
+                this.removeElement = removeElement;
+                this.setOpacityAsync = setOpacityAsync;
+                this.createInstance = function (options) {
+                    var instance = new BackDrop(_this.$q, _this.appendToBodyAsync, _this.extendCssAsync, _this.removeElement, _this.setOpacityAsync);
+                    return instance;
+                };
+                this.openAsync = function () {
+                    var deferred = _this.$q.defer();
+                    _this.initializeAsync()
+                        .then(_this.appendBackDropToBodyAsync)
+                        .then(_this.showAsync)
+                        .then(function () {
+                        _this.isOpen = true;
+                        deferred.resolve();
+                    });
+                    return deferred.promise;
+                };
+                this.closeAsync = function () {
+                    var deferred = _this.$q.defer();
+                    _this.hideAsync().then(function (results) {
+                        _this.dispose();
+                        _this.isOpen = false;
+                        deferred.resolve();
+                    });
+                    return deferred.promise;
+                };
+                this.initializeAsync = function () {
+                    var deferred = _this.$q.defer();
+                    _this.augmentedJQuery = angular.element("<div></div>");
+                    _this.extendCssAsync({
+                        nativeHTMLElement: _this.nativeHTMLElement,
+                        cssObject: {
+                            "-webkit-transition": "opacity 300ms ease-in-out",
+                            "-o-transition": "opacity 300ms ease-in-out",
+                            "transition": "opacity 300ms ease-in-out",
+                            "opacity": "0",
+                            "position": "fixed",
+                            "top": "0",
+                            "left": "0",
+                            "height": "100%",
+                            "width": "100%",
+                            "background-color": "rgba(0, 0, 0, .25)",
+                            "display": "block"
+                        }
+                    }).then(function () {
+                        deferred.resolve();
+                    });
+                    return deferred.promise;
+                };
+                this.showAsync = function () {
+                    return _this.setOpacityAsync({ nativeHtmlElement: _this.nativeHTMLElement, opacity: 25 });
+                };
+                this.appendBackDropToBodyAsync = function () {
+                    return _this.appendToBodyAsync({ nativeElement: _this.nativeHTMLElement });
+                };
+                this.hideAsync = function () {
+                    return _this.setOpacityAsync({ nativeHtmlElement: _this.nativeHTMLElement, opacity: 0 });
+                };
+                this.dispose = function () {
+                    _this.removeElement({ nativeHTMLElement: _this.nativeHTMLElement });
+                    _this.augmentedJQuery = null;
+                };
+                this.isOpen = false;
+                this.isAnimating = false;
+            }
+            Object.defineProperty(BackDrop.prototype, "nativeHTMLElement", {
+                get: function () { return this.augmentedJQuery[0]; },
+                enumerable: true,
+                configurable: true
+            });
+            return BackDrop;
+        })();
+        components.BackDrop = BackDrop;
+        angular.module("ngX.components").service("backDrop", ["$q", "appendToBodyAsync", "extendCssAsync", "removeElement", "setOpacityAsync", BackDrop]);
+    })(components = ngX.components || (ngX.components = {}));
+})(ngX || (ngX = {}));
+
+//# sourceMappingURL=backDrop.js.map
+
+var ngX;
+(function (ngX) {
+    var components;
+    (function (components) {
         /**
          * @name carousel
          * @module ngX.components
@@ -892,7 +986,56 @@ var ngX;
 
 //# sourceMappingURL=vimeo.js.map
 
-
+var ngX;
+(function (ngX) {
+    var components;
+    (function (components) {
+        /**
+        * @name VirtualFor
+        * @module ngX.components
+        */
+        var VirtualForAttribute = (function () {
+            function VirtualForAttribute($attrs, $compile, $element, $interval, getY, safeDigest, transformY) {
+                this.$attrs = $attrs;
+                this.$compile = $compile;
+                this.$element = $element;
+                this.$interval = $interval;
+                this.getY = getY;
+                this.safeDigest = safeDigest;
+                this.transformY = transformY;
+                this.onInit = function () {
+                };
+                this.dispose = function () {
+                };
+                this.render = function () {
+                };
+                this.scrollTo = function () {
+                };
+                this.initialRender = function () {
+                };
+                this.renderTopToBottom = function () {
+                };
+                this.renderBottomToTop = function () {
+                };
+                this.removeItem = function () {
+                };
+                this.moveAndUpdateScope = function () {
+                };
+                this.onResize = function () {
+                };
+                this.calculateItemHeight = function () {
+                };
+            }
+            return VirtualForAttribute;
+        })();
+        ngX.Component({
+            module: "ngX.components",
+            selector: "virtual-for",
+            component: VirtualForAttribute,
+            providers: ["$attrs", "$compile", "$element", "$interval", "getY", "safeDigest", "transformY"]
+        });
+    })(components = ngX.components || (ngX.components = {}));
+})(ngX || (ngX = {}));
 
 //# sourceMappingURL=virtualFor.js.map
 
