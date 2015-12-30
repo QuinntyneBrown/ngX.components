@@ -141,13 +141,17 @@ var ngX;
                     setTimeout(function () {
                         _this.turnOffTransitions();
                         for (var i = 0; i < _this.slideNavtiveElements.length; i++) {
+                            _this.slideNavtiveElements[i].classList.add('notransition');
                             _this.translateX(_this.slideNavtiveElements[i], _this.startIndex);
+                            _this.slideNavtiveElements[i].classList.remove('notransition');
                         }
                         for (var i = 1; i <= _this.buffer; i++) {
                             _this.currentIndex = 0;
                             var desiredX = -1 * (Number(_this.width) * i);
                             var delta = desiredX - ((_this.items.length - i) * Number(_this.width));
+                            _this.rendererdNodes[_this.items.length - 1].node.classList.add('notransition');
                             _this.translateX(_this.rendererdNodes[_this.items.length - 1].node, delta + _this.startIndex);
+                            _this.rendererdNodes[_this.items.length - 1].node.classList.remove('notransition');
                             _this.isAnimating = false;
                         }
                         setTimeout(function () { _this.turnOnTransitions(); });
@@ -159,9 +163,13 @@ var ngX;
                         _this.turnOffTransitions();
                         var desiredX = -1 * (Number(_this.width) * _this.buffer);
                         var delta = desiredX - _this.rendererdNodes[_this.items.length - 1].offsetLeft;
+                        _this.rendererdNodes[0].node.classList.add('notransition');
                         _this.translateX(_this.rendererdNodes[_this.items.length - 1].node, delta + _this.startIndex);
                         _this.isAnimating = false;
-                        setTimeout(function () { _this.turnOnTransitions(); });
+                        setTimeout(function () {
+                            _this.rendererdNodes[0].node.classList.remove('notransition');
+                            _this.turnOnTransitions();
+                        });
                     });
                 };
                 this.onNextAsyncDebounce = function () { _this.debounce(_this.onNextAsync, 100)(); };
@@ -170,9 +178,14 @@ var ngX;
                         _this.turnOffTransitions();
                         var desiredX = (_this.items.length - 1 - _this.buffer) * Number(_this.width);
                         var delta = desiredX - _this.rendererdNodes[0].offsetLeft;
+                        var display = _this.rendererdNodes[0].node.style.display;
+                        _this.rendererdNodes[0].node.classList.add('notransition');
                         _this.translateX(_this.rendererdNodes[0].node, delta + _this.startIndex);
                         _this.isAnimating = false;
-                        setTimeout(function () { _this.turnOnTransitions(); });
+                        setTimeout(function () {
+                            _this.rendererdNodes[0].node.classList.remove('notransition');
+                            _this.turnOnTransitions();
+                        });
                     });
                 };
                 this.move = function (options) {

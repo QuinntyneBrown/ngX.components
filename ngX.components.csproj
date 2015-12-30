@@ -60,6 +60,9 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="assets\images\carousel_1.jpg" />
+    <Content Include="assets\images\carousel_2.jpg" />
+    <Content Include="assets\images\carousel_3.jpg" />
     <Content Include="assets\images\carousel_button_next.png" />
     <Content Include="assets\images\carousel_button_prev.png" />
     <Content Include="assets\images\photo1.jpg" />
@@ -81,9 +84,11 @@
     <Content Include="dist\ngX.components.min.js">
       <DependentUpon>ngX.components.js</DependentUpon>
     </Content>
+    <Content Include="examples\carousel2\index.html" />
     <Content Include="examples\carousel\index.html" />
     <Content Include="examples\carousel\slide.html" />
     <Content Include="examples\listDetail\index.html" />
+    <Content Include="examples\login\index.html" />
     <Content Include="examples\rotator\index.html" />
     <Content Include="examples\rotator\slide.html" />
     <Content Include="examples\vimeo\index.html" />
@@ -94,6 +99,7 @@
     <Content Include="dist\ngX.components.min.js.map">
       <DependentUpon>ngX.components.min.js</DependentUpon>
     </Content>
+    <Content Include="package.json" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -151,7 +157,7 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>True</UseIIS>
+          <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>58384</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>

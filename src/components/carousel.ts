@@ -48,16 +48,20 @@
             setTimeout(() => {
 
                 this.turnOffTransitions();
-
+                
                 for (var i = 0; i < this.slideNavtiveElements.length; i++) {
+                    this.slideNavtiveElements[i].classList.add('notransition');
                     this.translateX(this.slideNavtiveElements[i], this.startIndex);
+                    this.slideNavtiveElements[i].classList.remove('notransition');                    
                 }
 
                 for (var i = 1; i <= this.buffer; i++) {
                     this.currentIndex = 0;
                     var desiredX = -1 * (Number(this.width) * i);
                     var delta = desiredX - ((this.items.length - i) * Number(this.width));
+                    this.rendererdNodes[this.items.length - 1].node.classList.add('notransition');
                     this.translateX(this.rendererdNodes[this.items.length - 1].node, delta + this.startIndex);
+                    this.rendererdNodes[this.items.length - 1].node.classList.remove('notransition');
                     this.isAnimating = false;
                 }
                 
@@ -77,9 +81,13 @@
                 this.turnOffTransitions();                
                 var desiredX = -1 * (Number(this.width) * this.buffer);
                 var delta = desiredX - this.rendererdNodes[this.items.length - 1].offsetLeft;
+                this.rendererdNodes[0].node.classList.add('notransition');
                 this.translateX(this.rendererdNodes[this.items.length - 1].node, delta + this.startIndex);
                 this.isAnimating = false;
-                setTimeout(() => { this.turnOnTransitions(); });
+                setTimeout(() => {
+                    this.rendererdNodes[0].node.classList.remove('notransition');
+                    this.turnOnTransitions();
+                });
             });
         }
 
@@ -90,9 +98,14 @@
                 this.turnOffTransitions();
                 var desiredX = (this.items.length - 1 - this.buffer) * Number(this.width);
                 var delta = desiredX - this.rendererdNodes[0].offsetLeft;
-                this.translateX(this.rendererdNodes[0].node, delta + this.startIndex);
+                var display = this.rendererdNodes[0].node.style.display;
+                this.rendererdNodes[0].node.classList.add('notransition');
+                this.translateX(this.rendererdNodes[0].node, delta + this.startIndex);                
                 this.isAnimating = false;
-                setTimeout(() => { this.turnOnTransitions(); });
+                setTimeout(() => {
+                    this.rendererdNodes[0].node.classList.remove('notransition');
+                    this.turnOnTransitions();
+                });
             });
         }
 
