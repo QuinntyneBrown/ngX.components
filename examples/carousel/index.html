@@ -7,6 +7,23 @@
             padding: 0;
             margin: 0;
         }
+
+        .carousel img { 
+            -webkit-filter: blur(1px) grayscale(100%);
+            -ms-filter: blur(1px) grayscale(100%);
+            filter: blur(1px) grayscale(100%);
+            opacity:.5;
+        }
+
+        .carousel img.current,
+        .carousel .previous-arrow img,
+        .carousel .next-arrow img {
+            -webkit-filter: blur(0px) grayscale(0%);
+            -ms-filter: blur(0px) grayscale(0%);
+            filter:blur(0px) grayscale(0%);
+            opacity:1;
+        }
+
     </style>
 </head>
 <body data-ng-app="ngX.components" data-ng-controller="pageController as vm">
@@ -15,6 +32,7 @@
 
         <div style="width:1200px; height: 800px; margin: 0 auto;">
             <carousel id="featured"
+                     start-index="80"
                      items="vm.photos"
                      carousel-for-name="photo"
                      next-button-image-url="'../../assets/images/carousel_button_next.png'"
@@ -38,7 +56,7 @@
         function pageController($scope) {
 
             $scope.$on("componentUpdate", function (event, obj) {
-                console.log(obj.scope.vm.currentIndex);
+                
             });
 
             var self = this;
@@ -57,7 +75,9 @@
             return self;
         }
 
-        angular.module("ngX.components").controller("pageController", ["$scope",pageController]);
+        angular.module("ngX.components").controller("pageController", ["$scope", pageController]).run(["carouselConfig", function (carouselConfig) {
+            carouselConfig.default.startIndex = 420;
+        }]);
 
     </script>
 </body>

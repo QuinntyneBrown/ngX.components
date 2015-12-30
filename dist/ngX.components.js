@@ -100,12 +100,18 @@ var ngX;
 (function (ngX) {
     var components;
     (function (components) {
+        var config = {};
+        config["default"] = {
+            startIndex: 0,
+            buffer: 2
+        };
+        angular.module("ngX.components").value("carouselConfig", config);
         /**
          * @name carousel
          * @module ngX.components
          */
         var carousel = (function () {
-            function carousel($attrs, $compile, $element, $http, $interval, $location, $q, $scope, $timeout, $transclude, debounce, getFromUrlSync, getX, translateX, translateXAsync) {
+            function carousel($attrs, $compile, $element, $http, $interval, $location, $q, $scope, $timeout, $transclude, carouselConfig, debounce, getFromUrlSync, getX, translateX, translateXAsync) {
                 var _this = this;
                 this.$attrs = $attrs;
                 this.$compile = $compile;
@@ -117,6 +123,7 @@ var ngX;
                 this.$scope = $scope;
                 this.$timeout = $timeout;
                 this.$transclude = $transclude;
+                this.carouselConfig = carouselConfig;
                 this.debounce = debounce;
                 this.getFromUrlSync = getFromUrlSync;
                 this.getX = getX;
@@ -139,6 +146,8 @@ var ngX;
                     }
                     _this.containerNavtiveElement.appendChild(fragment);
                     setTimeout(function () {
+                        _this.currentIndex = 0;
+                        _this.setCurrentCssClass();
                         _this.turnOffTransitions();
                         for (var i = 0; i < _this.slideNavtiveElements.length; i++) {
                             _this.slideNavtiveElements[i].classList.add('notransition');
@@ -146,7 +155,6 @@ var ngX;
                             _this.slideNavtiveElements[i].classList.remove('notransition');
                         }
                         for (var i = 1; i <= _this.buffer; i++) {
-                            _this.currentIndex = 0;
                             var desiredX = -1 * (Number(_this.width) * i);
                             var delta = desiredX - ((_this.items.length - i) * Number(_this.width));
                             _this.rendererdNodes[_this.items.length - 1].node.classList.add('notransition');
@@ -156,6 +164,12 @@ var ngX;
                         }
                         setTimeout(function () { _this.turnOnTransitions(); });
                     }, 300);
+                };
+                this.setCurrentCssClass = function () {
+                    for (var i = 0; i < _this.items.length - 1; i++) {
+                        _this.slideNavtiveElements[i].classList.remove("current");
+                    }
+                    _this.slideNavtiveElements[_this.currentIndex].classList.add("current");
                 };
                 this.onPreviousAsyncDebounce = function () { _this.debounce(_this.onPreviousAsync, 100)(); };
                 this.onPreviousAsync = function () {
@@ -168,6 +182,13 @@ var ngX;
                         _this.isAnimating = false;
                         setTimeout(function () {
                             _this.rendererdNodes[0].node.classList.remove('notransition');
+                            if (_this.currentIndex == 0) {
+                                _this.currentIndex = _this.items.length - 1;
+                            }
+                            else {
+                                _this.currentIndex = _this.currentIndex - 1;
+                            }
+                            _this.setCurrentCssClass();
                             _this.turnOnTransitions();
                         });
                     });
@@ -185,6 +206,13 @@ var ngX;
                         setTimeout(function () {
                             _this.rendererdNodes[0].node.classList.remove('notransition');
                             _this.turnOnTransitions();
+                            if (_this.currentIndex == _this.items.length - 1) {
+                                _this.currentIndex = 0;
+                            }
+                            else {
+                                _this.currentIndex = _this.currentIndex + 1;
+                            }
+                            _this.setCurrentCssClass();
                         });
                     });
                 };
@@ -228,12 +256,14 @@ var ngX;
                 this._template = null;
             }
             Object.defineProperty(carousel.prototype, "startIndex", {
-                get: function () { return 80; },
+                get: function () {
+                    return this.carouselConfig.default.startIndex;
+                },
                 enumerable: true,
                 configurable: true
             });
             Object.defineProperty(carousel.prototype, "buffer", {
-                get: function () { return 2; },
+                get: function () { return this.carouselConfig.default.buffer; },
                 enumerable: true,
                 configurable: true
             });
@@ -357,6 +387,7 @@ var ngX;
                 "$scope",
                 "$timeout",
                 "$transclude",
+                "carouselConfig",
                 "debounce",
                 "getFromUrlSync",
                 "getX",

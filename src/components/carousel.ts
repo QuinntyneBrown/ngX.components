@@ -1,5 +1,13 @@
 ﻿﻿﻿﻿module ngX.components {
     
+       var config = {};
+
+       config["default"] = {
+           startIndex: 0,
+           buffer:2
+       };
+
+       angular.module("ngX.components").value("carouselConfig", config);    
     /**
      * @name carousel
      * @module ngX.components
@@ -16,13 +24,16 @@
             private $scope: ng.IScope,
             private $timeout: ng.ITimeoutService,
             private $transclude: Function,
+            private carouselConfig: any,
             private debounce: Function,
             private getFromUrlSync: Function,
             private getX: Function,
             private translateX: Function,
             private translateXAsync: Function) { }
 
-        private get startIndex() { return 80; }
+        private get startIndex() {            
+            return this.carouselConfig.default.startIndex;
+        }
 
         private onInit = () => {
 
@@ -42,10 +53,17 @@
                 itemContent.addClass("slide");
                 fragment.appendChild(itemContent[0]);
             }
+            
 
             this.containerNavtiveElement.appendChild(fragment);
 
+            
+
             setTimeout(() => {
+
+                this.currentIndex = 0;
+
+                this.setCurrentCssClass();
 
                 this.turnOffTransitions();
                 
@@ -56,7 +74,6 @@
                 }
 
                 for (var i = 1; i <= this.buffer; i++) {
-                    this.currentIndex = 0;
                     var desiredX = -1 * (Number(this.width) * i);
                     var delta = desiredX - ((this.items.length - i) * Number(this.width));
                     this.rendererdNodes[this.items.length - 1].node.classList.add('notransition');
@@ -72,11 +89,19 @@
 
         }
 
-        private get buffer() { return 2; }
+        setCurrentCssClass = () => {
+            for (var i = 0; i < this.items.length - 1; i++) {
+                this.slideNavtiveElements[i].classList.remove("current");
+            }
+            this.slideNavtiveElements[this.currentIndex].classList.add("current");
+        }
+
+        private get buffer() { return this.carouselConfig.default.buffer; }
 
         public onPreviousAsyncDebounce = () => { this.debounce(this.onPreviousAsync, 100)(); }
 
         public onPreviousAsync = () => {
+
             return this.move({ x: (Number(this.width)) }).then(() => {
                 this.turnOffTransitions();                
                 var desiredX = -1 * (Number(this.width) * this.buffer);
@@ -86,6 +111,13 @@
                 this.isAnimating = false;
                 setTimeout(() => {
                     this.rendererdNodes[0].node.classList.remove('notransition');
+                    if (this.currentIndex == 0) {
+                        this.currentIndex = this.items.length - 1
+                    }
+                    else {
+                        this.currentIndex = this.currentIndex - 1;
+                    }
+                    this.setCurrentCssClass();
                     this.turnOnTransitions();
                 });
             });
@@ -105,6 +137,14 @@
                 setTimeout(() => {
                     this.rendererdNodes[0].node.classList.remove('notransition');
                     this.turnOnTransitions();
+                    if (this.currentIndex == this.items.length - 1) {
+                        this.currentIndex = 0;
+                    }
+                    else {
+                        this.currentIndex = this.currentIndex + 1;
+                    }
+
+                    this.setCurrentCssClass();
                 });
             });
         }
@@ -284,6 +324,7 @@
             "$scope",
             "$timeout",
             "$transclude",
+            "carouselConfig",
             "debounce",
             "getFromUrlSync",
             "getX",
