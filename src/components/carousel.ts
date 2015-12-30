@@ -90,9 +90,6 @@
         }
 
         setCurrentCssClass = () => {
-            for (var i = 0; i < this.items.length - 1; i++) {
-                this.slideNavtiveElements[i].classList.remove("current");
-            }
             this.slideNavtiveElements[this.currentIndex].classList.add("current");
         }
 
@@ -101,6 +98,18 @@
         public onPreviousAsyncDebounce = () => { this.debounce(this.onPreviousAsync, 100)(); }
 
         public onPreviousAsync = () => {
+
+            this.slideNavtiveElements[this.currentIndex].classList.remove("current");
+
+            if (!this.isAnimating && !this.inTransition) {
+                if (this.currentIndex == 0) {
+                    this.currentIndex = this.items.length - 1
+                }
+                else {
+                    this.currentIndex = this.currentIndex - 1;
+                }
+                this.setCurrentCssClass();
+            }
 
             return this.move({ x: (Number(this.width)) }).then(() => {
                 this.turnOffTransitions();                
@@ -111,13 +120,7 @@
                 this.isAnimating = false;
                 setTimeout(() => {
                     this.rendererdNodes[0].node.classList.remove('notransition');
-                    if (this.currentIndex == 0) {
-                        this.currentIndex = this.items.length - 1
-                    }
-                    else {
-                        this.currentIndex = this.currentIndex - 1;
-                    }
-                    this.setCurrentCssClass();
+
                     this.turnOnTransitions();
                 });
             });
@@ -126,6 +129,19 @@
         public onNextAsyncDebounce = () => { this.debounce(this.onNextAsync, 100)(); }
 
         public onNextAsync = () => {
+
+            this.slideNavtiveElements[this.currentIndex].classList.remove("current");
+
+            if (!this.isAnimating && !this.inTransition) {
+                if (this.currentIndex == this.items.length - 1) {
+                    this.currentIndex = 0;
+                }
+                else {
+                    this.currentIndex = this.currentIndex + 1;
+                }
+                this.setCurrentCssClass();
+            }
+
             return this.move({ x: (-1) * (Number(this.width)) }).then(() => {
                 this.turnOffTransitions();
                 var desiredX = (this.items.length - 1 - this.buffer) * Number(this.width);
@@ -137,14 +153,6 @@
                 setTimeout(() => {
                     this.rendererdNodes[0].node.classList.remove('notransition');
                     this.turnOnTransitions();
-                    if (this.currentIndex == this.items.length - 1) {
-                        this.currentIndex = 0;
-                    }
-                    else {
-                        this.currentIndex = this.currentIndex + 1;
-                    }
-
-                    this.setCurrentCssClass();
                 });
             });
         }

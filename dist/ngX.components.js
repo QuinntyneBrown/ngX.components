@@ -166,13 +166,20 @@ var ngX;
                     }, 300);
                 };
                 this.setCurrentCssClass = function () {
-                    for (var i = 0; i < _this.items.length - 1; i++) {
-                        _this.slideNavtiveElements[i].classList.remove("current");
-                    }
                     _this.slideNavtiveElements[_this.currentIndex].classList.add("current");
                 };
                 this.onPreviousAsyncDebounce = function () { _this.debounce(_this.onPreviousAsync, 100)(); };
                 this.onPreviousAsync = function () {
+                    _this.slideNavtiveElements[_this.currentIndex].classList.remove("current");
+                    if (!_this.isAnimating && !_this.inTransition) {
+                        if (_this.currentIndex == 0) {
+                            _this.currentIndex = _this.items.length - 1;
+                        }
+                        else {
+                            _this.currentIndex = _this.currentIndex - 1;
+                        }
+                        _this.setCurrentCssClass();
+                    }
                     return _this.move({ x: (Number(_this.width)) }).then(function () {
                         _this.turnOffTransitions();
                         var desiredX = -1 * (Number(_this.width) * _this.buffer);
@@ -182,19 +189,22 @@ var ngX;
                         _this.isAnimating = false;
                         setTimeout(function () {
                             _this.rendererdNodes[0].node.classList.remove('notransition');
-                            if (_this.currentIndex == 0) {
-                                _this.currentIndex = _this.items.length - 1;
-                            }
-                            else {
-                                _this.currentIndex = _this.currentIndex - 1;
-                            }
-                            _this.setCurrentCssClass();
                             _this.turnOnTransitions();
                         });
                     });
                 };
                 this.onNextAsyncDebounce = function () { _this.debounce(_this.onNextAsync, 100)(); };
                 this.onNextAsync = function () {
+                    _this.slideNavtiveElements[_this.currentIndex].classList.remove("current");
+                    if (!_this.isAnimating && !_this.inTransition) {
+                        if (_this.currentIndex == _this.items.length - 1) {
+                            _this.currentIndex = 0;
+                        }
+                        else {
+                            _this.currentIndex = _this.currentIndex + 1;
+                        }
+                        _this.setCurrentCssClass();
+                    }
                     return _this.move({ x: (-1) * (Number(_this.width)) }).then(function () {
                         _this.turnOffTransitions();
                         var desiredX = (_this.items.length - 1 - _this.buffer) * Number(_this.width);
@@ -206,13 +216,6 @@ var ngX;
                         setTimeout(function () {
                             _this.rendererdNodes[0].node.classList.remove('notransition');
                             _this.turnOnTransitions();
-                            if (_this.currentIndex == _this.items.length - 1) {
-                                _this.currentIndex = 0;
-                            }
-                            else {
-                                _this.currentIndex = _this.currentIndex + 1;
-                            }
-                            _this.setCurrentCssClass();
                         });
                     });
                 };
