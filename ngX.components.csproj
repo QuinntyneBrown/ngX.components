@@ -89,6 +89,7 @@
     <Content Include="examples\carousel\slide.html" />
     <Content Include="examples\listDetail\index.html" />
     <Content Include="examples\login\index.html" />
+    <Content Include="examples\modal\index.html" />
     <Content Include="examples\rotator\index.html" />
     <Content Include="examples\rotator\slide.html" />
     <Content Include="examples\vimeo\index.html" />
@@ -119,6 +120,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="src\actions\action-constants.ts" />
     <TypeScriptCompile Include="src\components\backDrop.ts" />
     <TypeScriptCompile Include="src\components\carousel.ts" />
     <TypeScriptCompile Include="src\components\footer.ts" />
@@ -126,6 +128,7 @@
     <TypeScriptCompile Include="src\components\header.ts" />
     <TypeScriptCompile Include="src\components\listDetail.ts" />
     <TypeScriptCompile Include="src\components\loginForm.ts" />
+    <TypeScriptCompile Include="src\components\modal.ts" />
     <TypeScriptCompile Include="src\components\rotator.ts" />
     <TypeScriptCompile Include="src\components\scrollHeader.ts" />
     <TypeScriptCompile Include="src\components\socialMediaMetaTag.ts" />

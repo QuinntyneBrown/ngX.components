@@ -2,6 +2,14 @@ angular.module("ngX.components", ["ngX"]);
 
 //# sourceMappingURL=ngX.components.module.js.map
 
+angular.module("ngX.components").value("APP_ACTIONS", {
+    OPEN_MODAL: -1,
+    CLOSE_MODAL: -2,
+    TOGGLE_PIN_MODAL: -3
+});
+
+//# sourceMappingURL=action-constants.js.map
+
 var ngX;
 (function (ngX) {
     var components;
@@ -586,6 +594,133 @@ var ngX;
 })(ngX || (ngX = {}));
 
 //# sourceMappingURL=loginForm.js.map
+
+var Modal = (function () {
+    function Modal($compile, $location, $q, $rootScope, APP_ACTIONS, appendToBodyAsync, backDrop, dispatcher, extendCssAsync, removeElement, setOpacityAsync) {
+        var _this = this;
+        this.$compile = $compile;
+        this.$location = $location;
+        this.$q = $q;
+        this.$rootScope = $rootScope;
+        this.APP_ACTIONS = APP_ACTIONS;
+        this.appendToBodyAsync = appendToBodyAsync;
+        this.backDrop = backDrop;
+        this.dispatcher = dispatcher;
+        this.extendCssAsync = extendCssAsync;
+        this.removeElement = removeElement;
+        this.setOpacityAsync = setOpacityAsync;
+        this.openAsync = function (options) {
+            var openAsyncFn = function () {
+                _this._html = options.html;
+                return _this.initializeAsync()
+                    .then(_this.backDrop.openAsync)
+                    .then(_this.appendModalToBodyAsync)
+                    .then(_this.showAsync);
+            };
+            setTimeout(openAsyncFn, 100);
+        };
+        this.initializeAsync = function () {
+            var deferred = _this.$q.defer();
+            _this.$scope = _this.$rootScope.$new();
+            _this.compileAsync().then(function () {
+                _this.nativeElement = _this.augmentedJQuery[0];
+                _this.extendCssAsync({
+                    nativeHTMLElement: _this.nativeElement,
+                    cssObject: {
+                        "opacity": "0",
+                        "position": "fixed",
+                        "margin-top": "-300px",
+                        "top": "0",
+                        "left": "0",
+                        "background-color": "#FFF",
+                        "display": "block",
+                        "z-index": "999",
+                        "width": "100%",
+                        "padding": "30px",
+                        "transition": "all 0.5s",
+                        "-webkit-transition": "all 0.5s",
+                        "-o-transition": "all 0.5s"
+                    }
+                }).then(function () {
+                    deferred.resolve();
+                });
+            });
+            return deferred.promise;
+        };
+        this.compileAsync = function () {
+            var deferred = _this.$q.defer();
+            _this.augmentedJQuery = _this.$compile(angular.element(_this.html))(_this.$scope);
+            setTimeout(function () {
+                _this.$scope.$digest();
+                deferred.resolve();
+            }, 100);
+            return deferred.promise;
+        };
+        this.appendModalToBodyAsync = function () { return _this.appendToBodyAsync({ nativeElement: _this.nativeElement }); };
+        this.showAsync = function () { return _this.extendCssAsync({
+            nativeHTMLElement: _this.nativeElement,
+            cssObject: {
+                "opacity": "100",
+                "margin-top": "0px",
+            }
+        }); };
+        this.closeAsync = function () {
+            if (!_this.pinned) {
+                var deferred = _this.$q.defer();
+                try {
+                    _this.extendCssAsync({
+                        nativeHTMLElement: _this.nativeElement,
+                        cssObject: {
+                            "opacity": "0",
+                        }
+                    })
+                        .then(_this.backDrop.closeAsync)
+                        .then(function () {
+                        _this.augmentedJQuery[0].parentNode.removeChild(_this.augmentedJQuery[0]);
+                        deferred.resolve();
+                    });
+                }
+                catch (error) {
+                    deferred.resolve();
+                }
+                return deferred.promise;
+            }
+        };
+        this.dispose = function () { };
+        this.togglePin = function () {
+            if (_this.pinned) {
+                _this.pinned = false;
+                _this.closeAsync();
+            }
+            else {
+                _this.pinned = true;
+            }
+        };
+        this.pinned = false;
+        this.dispatcher.addListener({
+            actionType: this.APP_ACTIONS.OPEN_MODAL,
+            callback: function (options) { return _this.openAsync({ html: options.html }); }
+        });
+        this.dispatcher.addListener({
+            actionType: this.APP_ACTIONS.CLOSE_MODAL,
+            callback: function () { return _this.closeAsync(); }
+        });
+        this.dispatcher.addListener({
+            actionType: this.APP_ACTIONS.TOGGLE_PIN_MODAL,
+            callback: function () { return _this.togglePin(); }
+        });
+    }
+    Object.defineProperty(Modal.prototype, "html", {
+        get: function () { return this._html; },
+        enumerable: true,
+        configurable: true
+    });
+    return Modal;
+})();
+angular.module("ngX.components").service("modal", ["$compile", "$location", "$q", "$rootScope", "APP_ACTIONS", "appendToBodyAsync", "backDrop", "dispatcher", "extendCssAsync", "removeElement", "setOpacityAsync", Modal])
+    .run(["modal", function (modal) { }]);
+
+//# sourceMappingURL=modal.js.map
 
 var ngX;
 (function (ngX) {

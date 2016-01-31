@@ -1,0 +1,62 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Modal</title>
+</head>
+<body data-ng-app="ngX.components" data-ng-controller="appController as vm">
+
+    <h1 data-ng-click="vm.showModal()">Click Me</h1>
+
+    <script src="../../node_modules/angular/angular.js"></script>
+    <script src="../../node_modules/angular-route/angular-route.js"></script>
+    <script src="../../node_modules/ng-x/dist/ngX.js"></script>
+    <script src="../../dist/ngX.components.js"></script>
+
+    <script>
+        angular.module("ngX.components").controller("appController", ["APP_ACTIONS", "dispatcher", function (APP_ACTIONS, dispatcher) {
+
+            this.showModal = function () {
+                dispatcher.emit({
+                    actionType: APP_ACTIONS.OPEN_MODAL,
+                    options: { html: "<editor></editor>" }
+                });
+            }
+
+            
+
+            return this;
+        }]);
+
+        ngX.Component({
+            module: "ngX.components",
+            selector: "editor",
+            component: function editorComponent(APP_ACTIONS, dispatcher) {
+                var self = this;
+
+                self.pinned = false;
+                self.closeModal = function () {
+                    dispatcher.emit({
+                        actionType: APP_ACTIONS.CLOSE_MODAL
+                    });
+                }
+
+                self.pinModal = function () {
+                    dispatcher.emit({
+                        actionType: APP_ACTIONS.TOGGLE_PIN_MODAL
+                    });
+                    self.pinned = !self.pinned;
+                }
+
+                return self;
+            },
+            template: [
+                "<div>",
+                "<h1 data-ng-click='vm.closeModal()'>Works?</h1>",
+                "<h1 data-ng-click='vm.pinModal()' data-ng-if='!vm.pinned'>PIN</h1>",
+                "<h1 data-ng-click='vm.pinModal()' data-ng-if='vm.pinned'>CLOSE</h1>",
+                "</div>"],
+            providers: ["APP_ACTIONS","dispatcher"]
+        })
+    </script>
+</body>
+</html>
